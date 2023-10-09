@@ -1,6 +1,6 @@
 import pytest
 
-from kumbio_api_v2.users.models import User
+from kumbio_api_v2.users.models.users import User
 from kumbio_api_v2.users.tests.factories import UserFactory
 
 

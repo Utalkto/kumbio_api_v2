@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from kumbio_api_v2.users.models import User as UserType
+from kumbio_api_v2.users.models.users import User as UserType
 
 
 User = get_user_model()

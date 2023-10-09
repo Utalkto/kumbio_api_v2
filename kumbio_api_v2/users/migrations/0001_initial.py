@@ -3,7 +3,7 @@ import django.contrib.auth.validators
 from django.db import migrations, models
 import django.utils.timezone
 
-import kumbio_api_v2.users.models
+import kumbio_api_v2.users.models.users
 
 
 class Migration(migrations.Migration):
@@ -105,7 +105,7 @@ class Migration(migrations.Migration):
                 "abstract": False,
             },
             managers=[
-                ("objects", kumbio_api_v2.users.models.UserManager()),
+                ("objects", kumbio_api_v2.users.models.users.UserManager()),
             ],
         ),
     ]
