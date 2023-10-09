@@ -3,7 +3,6 @@ from rest_framework import serializers
 
 from kumbio_api_v2.users.models.users import User as UserType
 
-
 User = get_user_model()
 
 
