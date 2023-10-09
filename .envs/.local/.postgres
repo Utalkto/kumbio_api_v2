@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=kumbio_api_v2
+POSTGRES_USER=OKtmhMPFMSPmaUWItuJeKbxAVCXajnaz
+POSTGRES_PASSWORD=zWcF1AesiC4nHrn0bGbYZPXRWvvUp0nisgcpxU7GZMIdxIzyNPqayX2wGV9TXuoB
