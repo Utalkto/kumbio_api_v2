@@ -10,16 +10,11 @@ class Sector(KumbioModel):
 
     name = models.CharField(max_length=100)
     description = models.TextField()
-    default_image = models.ImageField(
-        upload_to='organizations',
-        default=None,
-        null=True,
-        blank=True
-    )
+    default_image = models.ImageField(upload_to="organizations", default=None, null=True, blank=True)
 
     class Meta:
-        verbose_name = 'Sector'
-        verbose_name_plural = 'Sectores'
+        verbose_name = "Sector"
+        verbose_name_plural = "Sectores"
 
     def __str__(self) -> str:
-        return f'{self.name}'
+        return f"{self.name}"
