@@ -6,10 +6,10 @@ from kumbio_api_v2.organizations.models import (
     MembershipType,
     Organization,
     OrganizationMembership,
+    Professional,
     Sector,
-    Service,
     Sede,
-    Professional
+    Service,
 )
 
 
@@ -26,6 +26,7 @@ class OrganizationSedeInline(admin.TabularInline):
 class SedeServicesInline(admin.TabularInline):
     model = Service.sedes.through
     extra = 0
+
 
 class SedeProfesionalInline(admin.TabularInline):
     model = Professional
@@ -87,9 +88,9 @@ class ProfessionalAdmin(admin.ModelAdmin):
     autocomplete_fields = ["services"]
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
-        if db_field.name == 'servicios':
-            if 'sede' in request.GET:
-                sede_id = request.GET['sede']
+        if db_field.name == "servicios":
+            if "sede" in request.GET:
+                sede_id = request.GET["sede"]
                 sede = Sede.objects.get(id=sede_id)
-                kwargs['queryset'] = sede.servicios.all()
+                kwargs["queryset"] = sede.servicios.all()
         return super().formfield_for_manytomany(db_field, request, **kwargs)

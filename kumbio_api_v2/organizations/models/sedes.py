@@ -15,14 +15,15 @@ class Sede(KumbioModel):
 
     name = models.CharField(max_length=255)
 
-    organization = models.ForeignKey("organizations.Organization", on_delete=models.CASCADE, related_name="organization_sedes")
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.CASCADE, related_name="organization_sedes"
+    )
 
-    sede_type = models.CharField( max_length=10, choices=SedeTypeOptions.choices, default=SedeTypeOptions.PHYSICAL)
+    sede_type = models.CharField(max_length=10, choices=SedeTypeOptions.choices, default=SedeTypeOptions.PHYSICAL)
 
     address = models.CharField(max_length=255)
     maps_url = models.URLField(max_length=255, null=True, blank=True)
     phone = models.CharField(max_length=255, null=True, blank=True)
-
 
     class Meta:
         """Meta class."""
@@ -32,4 +33,3 @@ class Sede(KumbioModel):
 
     def __str__(self):
         return f"Sede {self.name} - {self.organization}"
-    

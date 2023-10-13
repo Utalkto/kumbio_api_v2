@@ -22,23 +22,29 @@ class Appointment(KumbioModel):
         TRANSFER = "TRANSFER", "Transferencia"
         STRIPE = "STRIPE", "Stripe"
         OTHER = "OTHER", "Otro"
-    
+
     class CreatedByOptions(models.TextChoices):
         """Created by options."""
 
         CLIENT = "CLIENT", "Cliente"
         ADMIN = "ADMIN", "Administrador"
 
-    #only one service and professional per appointment for easier management
-    #so we have to create a new appointment for each service
-    #dont need organization because we have sede
-    payment_status = models.CharField( max_length=10, choices=PaymentStatusOptions.choices, default=PaymentStatusOptions.PENDING)
-    payment_method = models.CharField( max_length=10, choices=PaymentMethodOptions.choices, default=PaymentMethodOptions.CASH)
-    professional = models.ForeignKey("organizations.Professional", on_delete=models.CASCADE, related_name="professional_appointments")
+    # only one service and professional per appointment for easier management
+    # so we have to create a new appointment for each service
+    # dont need organization because we have sede
+    payment_status = models.CharField(
+        max_length=10, choices=PaymentStatusOptions.choices, default=PaymentStatusOptions.PENDING
+    )
+    payment_method = models.CharField(
+        max_length=10, choices=PaymentMethodOptions.choices, default=PaymentMethodOptions.CASH
+    )
+    professional = models.ForeignKey(
+        "organizations.Professional", on_delete=models.CASCADE, related_name="professional_appointments"
+    )
     sede = models.ForeignKey("organizations.Sede", on_delete=models.CASCADE, related_name="sede_appointments")
     start_date = models.DateTimeField(auto_now=False, auto_now_add=False)
     end_date = models.DateTimeField(auto_now=False, auto_now_add=False)
-    created_by = models.CharField( max_length=10, choices=CreatedByOptions.choices, default=CreatedByOptions.CLIENT)
+    created_by = models.CharField(max_length=10, choices=CreatedByOptions.choices, default=CreatedByOptions.CLIENT)
     service = models.ForeignKey("organizations.Service", on_delete=models.CASCADE, related_name="service_appointments")
 
     class Meta:
