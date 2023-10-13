@@ -39,7 +39,7 @@ class Appointment(KumbioModel):
     start_date = models.DateTimeField(auto_now=False, auto_now_add=False)
     end_date = models.DateTimeField(auto_now=False, auto_now_add=False)
     created_by = models.CharField( max_length=10, choices=CreatedByOptions.choices, default=CreatedByOptions.CLIENT)
-    service = models.ForeignKey("services.Service", on_delete=models.CASCADE, related_name="service_appointments")
+    service = models.ForeignKey("organizations.Service", on_delete=models.CASCADE, related_name="service_appointments")
 
     class Meta:
         """Meta class."""
