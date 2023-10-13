@@ -5,7 +5,7 @@ from django.contrib import admin
 from kumbio_api_v2.organizations.models import MembershipType, Organization, OrganizationMembership, Sector
 
 
-class OrganizationMembershipInline(admin.TabularInline):
+class OrganizationMembershipInline(admin.StackedInline):
     model = OrganizationMembership
     extra = 0
 
