@@ -24,11 +24,7 @@ class UserAdmin(auth_admin.UserAdmin):
         [
             ("Tipo usuario"),
             {
-                "fields": (
-                    "is_active",
-                    "is_staff",
-                    "is_superuser",
-                ),
+                "fields": ("is_client", "is_owner", "is_professional", "is_staff"),
             },
         ],
         [
@@ -38,7 +34,7 @@ class UserAdmin(auth_admin.UserAdmin):
             },
         ],
     ]
-    list_display = ["email", "name", "is_superuser"]
+    list_display = ["email", "name", "is_owner", "is_client"]
     search_fields = ["name"]
     ordering = ["id"]
     add_fieldsets = (
