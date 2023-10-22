@@ -6,6 +6,8 @@ from django.db import models
 # Models
 from kumbio_api_v2.utils.models import KumbioModel
 
+# Utils
+from datetime import datetime, timedelta
 
 class Organization(KumbioModel):
     """Organization model."""
@@ -42,6 +44,15 @@ class OrganizationMembership(KumbioModel):
     )
     start_date = models.DateField("Iinit date", null=True, blank=True)
     expiration = models.DateField("Expiration date", auto_now=False, auto_now_add=False)
+
+    def save(self, *args, **kwargs):
+        if not self.start_date or not self.expiration:
+            days_durration = self.membership.trial_days
+            date_now = datetime.now().date()
+            date_expiration = date_now + timedelta(days=days_durration)
+            self.start_date = date_now
+            self.expiration = date_expiration
+        super().save(*args, **kwargs)
 
     class Meta:
         """Meta class."""
