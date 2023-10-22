@@ -8,6 +8,7 @@ from kumbio_api_v2.organizations.models import (
     OrganizationMembership,
     Professional,
     Sector,
+    SubSector,
     Sede,
     Service,
 )
@@ -32,6 +33,10 @@ class SedeProfesionalInline(admin.TabularInline):
     model = Professional
     extra = 0
 
+class SubSectorInline(admin.TabularInline):
+    model = SubSector
+    extra = 0
+
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
@@ -50,6 +55,7 @@ class SectorAdmin(admin.ModelAdmin):
     list_display = ["name"]
     search_fields = ["name"]
     list_filter = ["name"]
+    inlines = [SubSectorInline]
 
 
 @admin.register(MembershipType)

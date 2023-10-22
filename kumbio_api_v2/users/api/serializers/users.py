@@ -12,7 +12,12 @@ from rest_framework.validators import UniqueValidator
 
 # Models
 from kumbio_api_v2.users.models import User
-from kumbio_api_v2.organizations.models import Organization
+from kumbio_api_v2.organizations.models import (
+    Organization,
+    OrganizationMembership,
+    MembershipType,
+    Sede
+)
 
 
 # Utilities
@@ -63,9 +68,17 @@ class UserSignUpSerializer(serializers.Serializer):
         email = data.get("email")
         password = data.get("password")
         # Create organization
-        Organization.objects.create(
-            name=organization_name,
-            sector_id=sector
+        organization = Organization.objects.create(name=organization_name, sector_id=sector)
+        # Create membreship
+        OrganizationMembership.objects.create(
+            membership = MembershipType.objects.get(membership_type="PREMIUM"),
+            organization = organization,
+            is_active = True,
+        )
+        # Create sede
+        Sede.objects.create(
+            name = organization_name,
+            organization=organization,
         )
         # Create user
         User.objects.create_user(email=email, password=password,  is_owner=True)
