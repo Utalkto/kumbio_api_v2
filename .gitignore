@@ -279,3 +279,6 @@ kumbio_api_v2/media/
 .env
 .envs/*
 !.envs/.local/
+pruebas.txt
+.envs/.local/.mailjet
+.envs/.local/.ultramsg

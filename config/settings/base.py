@@ -80,7 +80,7 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
 ]
 
-LOCAL_APPS = ["kumbio_api_v2.users", "kumbio_api_v2.organizations", "kumbio_api_v2.appointments"]
+LOCAL_APPS = ["kumbio_api_v2.users", "kumbio_api_v2.organizations", "kumbio_api_v2.appointments", "kumbio_api_v2.communications"]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
