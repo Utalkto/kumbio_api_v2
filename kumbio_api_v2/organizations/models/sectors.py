@@ -1,8 +1,6 @@
 # Django
 from django.db import models
 from slugify import slugify
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
 
 # Models
 from kumbio_api_v2.utils.models import KumbioModel

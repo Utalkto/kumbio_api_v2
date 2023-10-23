@@ -1,6 +1,11 @@
-from django.db import models
+"""Headquarters model"""
 
-from kumbio_api_v2.utils.models import KumbioModel
+# Django
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+# Models
+from kumbio_api_v2.utils.models import KumbioModel, DaysChoices
 
 
 class Sede(KumbioModel):
@@ -33,3 +38,22 @@ class Sede(KumbioModel):
 
     def __str__(self):
         return f"Sede {self.name} - {self.organization}"
+    
+
+class HeadquarterSchedule(KumbioModel):
+    """Headquarters schedule."""
+
+    day = models.CharField(max_length=10, choices=DaysChoices.choices, default=DaysChoices.MONDAY)
+    sede = models.ForeignKey(Sede, on_delete=models.CASCADE, related_name='sede_schedule')
+    hour_init = models.TimeField()
+    hour_end = models.TimeField()
+
+    def __str__(self):
+        """Return headquarter schedule."""
+        return f"{self.day} schedule: {self.hour_init} - {self.hour_end}"
+
+    class Meta:
+        """Meta class."""
+
+        verbose_name = "Horario de la sede"
+        verbose_name_plural = "Horarios de las sedes"

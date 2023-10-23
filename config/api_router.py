@@ -16,6 +16,7 @@ else:
 
 router.register(r"users", user_views.UserViewSet, basename="users")
 router.register(r"organizations", organization_views.OrganizationViewSet, basename="organizations")
+router.register(r"organizations/(?P<organization_pk>[^/.]+)/sedes", organization_views.SedeViewset, basename="sedes")
 
 
 app_name = "api"
