@@ -26,3 +26,13 @@ class KumbioModel(models.Model):
         abstract = True
         get_latest_by = "created"
         ordering = ["-created", "-modified"]
+
+
+class DaysChoices(models.TextChoices):
+    MONDAY = 'MONDAY', 'Lunes'
+    TUESDAY = 'TUESDAY', 'Martes'
+    WEDNESDAY = 'WEDNESDAY', 'Miércoles'
+    THURSDAY = 'THURSDAY', 'Jueves'
+    FRIDAY = 'FRIDAY', 'Viernes'
+    SATURDAY = 'SATURDAY', 'Sábado'
+    SUNDAY = 'SUNDAY', 'Domingo'

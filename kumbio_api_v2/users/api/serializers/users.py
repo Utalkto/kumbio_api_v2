@@ -71,13 +71,13 @@ class UserSignUpSerializer(serializers.Serializer):
         organization = Organization.objects.create(name=organization_name, sector_id=sector)
         # Create membreship
         OrganizationMembership.objects.create(
-            membership = MembershipType.objects.get(membership_type="PREMIUM"),
-            organization = organization,
-            is_active = True,
+            membership=MembershipType.objects.get(membership_type="PREMIUM"),
+            organization=organization,
+            is_active=True,
         )
         # Create sede
         Sede.objects.create(
-            name = organization_name,
+            name=organization_name,
             organization=organization,
         )
         # Create user

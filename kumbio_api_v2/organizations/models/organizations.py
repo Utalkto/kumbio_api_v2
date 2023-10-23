@@ -9,6 +9,7 @@ from kumbio_api_v2.utils.models import KumbioModel
 # Utils
 from datetime import datetime, timedelta
 
+
 class Organization(KumbioModel):
     """Organization model."""
 

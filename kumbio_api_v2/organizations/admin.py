@@ -33,6 +33,7 @@ class SedeProfesionalInline(admin.TabularInline):
     model = Professional
     extra = 0
 
+
 class SubSectorInline(admin.TabularInline):
     model = SubSector
     extra = 0
