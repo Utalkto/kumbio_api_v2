@@ -17,6 +17,14 @@ urlpatterns = [
     # Your stuff: custom urls includes go here
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+if "debug_toolbar" in settings.INSTALLED_APPS:
+    import debug_toolbar
+
+    if settings.ENABLE_SILK_DJANGO_REST:
+        urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
+
+    urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
+
 # API URLS
 urlpatterns += [
     # API base url
