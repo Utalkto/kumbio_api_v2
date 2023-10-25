@@ -3,14 +3,17 @@ from django.contrib import admin
 
 # Models
 from kumbio_api_v2.organizations.models import (
+    Country,
+    HeadquarterSchedule,
     MembershipType,
     Organization,
     OrganizationMembership,
     Professional,
+    ProfessionalSchedule,
     Sector,
-    SubSector,
     Sede,
     Service,
+    SubSector,
 )
 
 
@@ -36,6 +39,16 @@ class SedeProfesionalInline(admin.TabularInline):
 
 class SubSectorInline(admin.TabularInline):
     model = SubSector
+    extra = 0
+
+
+class HeadquarterScheduleInline(admin.TabularInline):
+    model = HeadquarterSchedule
+    extra = 0
+
+
+class ProfessionalScheduleInline(admin.TabularInline):
+    model = ProfessionalSchedule
     extra = 0
 
 
@@ -75,7 +88,7 @@ class SedeAdmin(admin.ModelAdmin):
     list_display = ["name"]
     search_fields = ["name"]
     list_filter = ["name"]
-    inlines = [SedeProfesionalInline, SedeServicesInline]
+    inlines = [HeadquarterScheduleInline, SedeProfesionalInline, SedeServicesInline]
 
 
 @admin.register(Service)
@@ -93,6 +106,7 @@ class ProfessionalAdmin(admin.ModelAdmin):
     """Service sede model admin."""
 
     autocomplete_fields = ["services"]
+    inlines = [ProfessionalScheduleInline]
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "servicios":
@@ -101,3 +115,12 @@ class ProfessionalAdmin(admin.ModelAdmin):
                 sede = Sede.objects.get(id=sede_id)
                 kwargs["queryset"] = sede.servicios.all()
         return super().formfield_for_manytomany(db_field, request, **kwargs)
+
+
+@admin.register(Country)
+class CountryAdmin(admin.ModelAdmin):
+    """Service sede model admin."""
+
+    list_display = ["name", "slug_name", "phone_prefix"]
+    search_fields = ["name", "phone_prefix"]
+    list_filter = ["name", "phone_prefix"]

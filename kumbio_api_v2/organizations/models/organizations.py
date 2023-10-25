@@ -1,13 +1,13 @@
 """Organizations models"""
 
 # Django
+# Utils
+from datetime import datetime, timedelta
+
 from django.db import models
 
 # Models
 from kumbio_api_v2.utils.models import KumbioModel
-
-# Utils
-from datetime import datetime, timedelta
 
 
 class Organization(KumbioModel):
@@ -19,7 +19,7 @@ class Organization(KumbioModel):
 
     description = models.TextField()
 
-    country = models.CharField(max_length=120, default=None, null=True, blank=True)
+    country = models.ForeignKey("Country", on_delete=models.CASCADE, related_name="organization_country")
 
     currency = models.CharField(max_length=120, default=None, null=True, blank=True)
 

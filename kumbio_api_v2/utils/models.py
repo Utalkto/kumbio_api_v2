@@ -29,10 +29,10 @@ class KumbioModel(models.Model):
 
 
 class DaysChoices(models.TextChoices):
-    MONDAY = 'MONDAY', 'Lunes'
-    TUESDAY = 'TUESDAY', 'Martes'
-    WEDNESDAY = 'WEDNESDAY', 'Miércoles'
-    THURSDAY = 'THURSDAY', 'Jueves'
-    FRIDAY = 'FRIDAY', 'Viernes'
-    SATURDAY = 'SATURDAY', 'Sábado'
-    SUNDAY = 'SUNDAY', 'Domingo'
+    MONDAY = "MONDAY", "Lunes"
+    TUESDAY = "TUESDAY", "Martes"
+    WEDNESDAY = "WEDNESDAY", "Miércoles"
+    THURSDAY = "THURSDAY", "Jueves"
+    FRIDAY = "FRIDAY", "Viernes"
+    SATURDAY = "SATURDAY", "Sábado"
+    SUNDAY = "SUNDAY", "Domingo"

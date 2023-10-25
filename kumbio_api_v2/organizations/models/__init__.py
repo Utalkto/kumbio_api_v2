@@ -1,3 +1,4 @@
+from .countries import *  # noqa
 from .memberships import *  # noqa
 from .organizations import *  # noqa
 from .professionals import *  # noqa

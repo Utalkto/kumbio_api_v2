@@ -26,11 +26,7 @@ class SubSector(KumbioModel):
 
     name = models.CharField(max_length=100)
     slug_name = models.SlugField(unique=True, max_length=100, blank=True, null=True)
-    sector = models.ForeignKey(
-        Sector,
-        on_delete=models.CASCADE,
-        related_name="sub_sectors"
-    )
+    sector = models.ForeignKey(Sector, on_delete=models.CASCADE, related_name="sub_sectors")
 
     def save(self, *args, **kwargs):
         if not self.slug_name:

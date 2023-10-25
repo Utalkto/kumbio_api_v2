@@ -4,6 +4,7 @@ from .base import env
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
+ENABLE_SILK_DJANGO_REST = True
 DEBUG = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = env(
@@ -47,3 +48,20 @@ INSTALLED_APPS += ["django_extensions"]  # noqa: F405
 CELERY_TASK_EAGER_PROPAGATES = True
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+# django-debug-toolbar
+if env.get_value("USE_DJANGO_DEBUG_TOOLBAR", default="no") == "yes":
+    # ------------------------------------------------------------------------------
+    # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#prerequisites
+    INSTALLED_APPS += ["debug_toolbar"]  # noqa F405
+    if ENABLE_SILK_DJANGO_REST:
+        INSTALLED_APPS += ["silk"]  # noqa F405
+    # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#middleware
+    MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]  # noqa F405
+    if ENABLE_SILK_DJANGO_REST:
+        MIDDLEWARE += ["silk.middleware.SilkyMiddleware"]  # noqa F405
+    # https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html#debug-toolbar-config
+    DEBUG_TOOLBAR_CONFIG = {
+        "DISABLE_PANELS": ["debug_toolbar.panels.redirects.RedirectsPanel"],
+        "SHOW_TEMPLATE_CONTEXT": True,
+    }

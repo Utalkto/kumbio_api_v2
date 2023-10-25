@@ -5,6 +5,9 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+# Rest framework
+from rest_framework.authtoken.models import Token
+
 from kumbio_api_v2.users.managers import UserManager
 
 
@@ -44,3 +47,8 @@ class User(AbstractUser):
 
         """
         return reverse("users:detail", kwargs={"pk": self.id})
+
+    @property
+    def get_autorized_token(self):
+        token, _is_new = Token.objects.update_or_create(user=self)
+        return token.key

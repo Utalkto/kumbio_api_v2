@@ -2,10 +2,9 @@
 
 # Django
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 # Models
-from kumbio_api_v2.utils.models import KumbioModel, DaysChoices
+from kumbio_api_v2.utils.models import DaysChoices, KumbioModel
 
 
 class Sede(KumbioModel):
@@ -38,13 +37,13 @@ class Sede(KumbioModel):
 
     def __str__(self):
         return f"Sede {self.name} - {self.organization}"
-    
+
 
 class HeadquarterSchedule(KumbioModel):
     """Headquarters schedule."""
 
     day = models.CharField(max_length=10, choices=DaysChoices.choices, default=DaysChoices.MONDAY)
-    sede = models.ForeignKey(Sede, on_delete=models.CASCADE, related_name='sede_schedule')
+    sede = models.ForeignKey(Sede, on_delete=models.CASCADE, related_name="sede_schedule")
     hour_init = models.TimeField()
     hour_end = models.TimeField()
 
