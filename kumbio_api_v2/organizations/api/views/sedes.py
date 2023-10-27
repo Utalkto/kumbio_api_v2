@@ -1,24 +1,21 @@
 """Sedes views."""
 
-# Django
-from django.shortcuts import get_object_or_404
-
 # Django REST Framework
-from rest_framework import mixins, viewsets, status
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 # Serializers
 from kumbio_api_v2.organizations.api.serializers import (
     OrganizationSedeSerializer,
+    ProfessionalScheduleSerializer,
     ProfessionalSerializer,
-    ServiceSedeSerializer,
-    ProfessionalScheduleSerializer
+    ServiceProfessionalSerializer,
 )
 
 # Models
-from kumbio_api_v2.organizations.models import Sede, Professional
+from kumbio_api_v2.organizations.models import Sede
 
 
 class SedeViewset(
@@ -39,19 +36,6 @@ class SedeViewset(
         return queryset
 
 
-class ServiceSedeViewset(
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.RetrieveModelMixin,
-    viewsets.GenericViewSet,
-):
-    serializer_class = ServiceSedeSerializer
-    lookup_field = "pk"
-    permission_classes = [IsAuthenticated]
-
-
 class ProfesionalViewset(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
@@ -60,7 +44,6 @@ class ProfesionalViewset(
     mixins.RetrieveModelMixin,
     viewsets.GenericViewSet,
 ):
-
     lookup_field = "pk"
     permission_classes = [IsAuthenticated]
 
@@ -73,38 +56,41 @@ class ProfesionalViewset(
 
     def get_serializer_class(self):
         """Return serializer based on action."""
-        if self.action in ['schedule']:
+        if self.action in ["schedule"]:
             return ProfessionalScheduleSerializer
+        if self.action in ["service"]:
+            return ServiceProfessionalSerializer
         else:
             return ProfessionalSerializer
         return super().get_serializer_class()
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        if self.action not in ['schedule']:
-            context.update({
-                "sede_pk": self.sede_pk,
-                "tutorial": self.tutorial
-            })
+        if self.action not in ["schedule"]:
+            context.update({"sede_pk": self.sede_pk, "tutorial": self.tutorial})
         return context
 
-    @action(detail=True, methods=['POST'], url_path='schedule')
+    @action(detail=True, methods=["POST"], url_path="schedule")
     def schedule(self, request, *args, **kwargs):
         """Add professional schedule."""
 
         serializer = self.get_serializer(
             data=request.data,
-            context={
-                "professional": self.professional_pk,
-                "sede": self.sede_pk,
-                "tutorial": self.tutorial
-            }
+            context={"professional": self.professional_pk, "sede": self.sede_pk, "tutorial": self.tutorial},
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        data= {
-            "created": "ok",
-            "professional_pk": self.professional_pk
-        }
+        data = {"created": "ok", "professional_pk": self.professional_pk, "sede_pk": self.sede_pk}
         return Response(data, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=["POST"], url_path="service")
+    def service(self, request, *args, **kwargs):
+        """Add professional service."""
+        serializer = self.get_serializer(
+            data=request.data,
+            context={"professional": self.professional_pk, "sede": self.sede_pk, "tutorial": self.tutorial},
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        data = {"created": "ok", "professional_pk": self.professional_pk, "sede_pk": self.sede_pk}
+        return Response(data, status=status.HTTP_200_OK)
