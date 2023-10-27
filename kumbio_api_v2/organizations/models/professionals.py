@@ -10,11 +10,10 @@ class Professional(KumbioModel):
     sede = models.ForeignKey("organizations.Sede", on_delete=models.CASCADE, related_name="organization_professionals")
     services = models.ManyToManyField("organizations.Service", related_name="service_professionals")
     is_user = models.BooleanField(default=False)
-    # need to add a field for the professional's schedule during the week
-    # maybe a json field with the days and hours available
-    # or a table with the days and hours available
-    # json field is easier to implement
-    # table is easier to query
+
+    @property
+    def organization(self):
+        return self.sede.organization
 
     class Meta:
         """Meta class."""
