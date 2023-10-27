@@ -105,6 +105,7 @@ class ServiceAdmin(admin.ModelAdmin):
 class ProfessionalAdmin(admin.ModelAdmin):
     """Service sede model admin."""
 
+    list_display = ["user", "sede"]
     autocomplete_fields = ["services"]
     inlines = [ProfessionalScheduleInline]
 
