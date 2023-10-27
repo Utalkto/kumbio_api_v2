@@ -24,12 +24,7 @@ class Country(KumbioModel):
     max_length_phone = models.IntegerField(null=True, blank=True)
     min_length_phone = models.IntegerField(null=True, blank=True)
 
-    optional_prefix = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True,
-        help_text='Some countries prefix'
-    )
+    optional_prefix = models.CharField(max_length=255, null=True, blank=True, help_text="Some countries prefix")
 
     def save(self, *args, **kwargs):
         self.slug_name = slugify(self.name, separator="_")

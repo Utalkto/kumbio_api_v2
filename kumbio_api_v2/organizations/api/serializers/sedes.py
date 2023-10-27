@@ -5,13 +5,7 @@
 from rest_framework import serializers
 
 # Models
-from kumbio_api_v2.organizations.models import (
-    Professional,
-    Sede,
-    Service,
-    ProfessionalSchedule,
-    HeadquarterSchedule
-)
+from kumbio_api_v2.organizations.models import HeadquarterSchedule, Professional, ProfessionalSchedule, Sede, Service
 from kumbio_api_v2.users.models import User
 
 
@@ -34,6 +28,7 @@ class ServiceSedeSerializer(serializers.ModelSerializer):
         model = Service
         fields = "__all__"
         read_only_fields = ("sedes",)
+
 
 class HeadquarterScheduleSerializer(serializers.ModelSerializer):
     """Service model serializer."""
@@ -91,9 +86,7 @@ class ProfessionalSerializer(serializers.Serializer):
 class ProfessionalScheduleSerializer(serializers.Serializer):
     """Proffesional schedule serializer."""
 
-    professional_schedule = serializers.ListField(
-        child=serializers.DictField(required=True)
-    )
+    professional_schedule = serializers.ListField(child=serializers.DictField(required=True))
 
     def create(self, validated_data):
         sede = self.context.get("sede")
@@ -108,8 +101,30 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
             if tutorial:
                 schedule.pop("professional")
                 schedule["sede"] = sede
-                serializer_headquarter =HeadquarterScheduleSerializer(data=schedule)
+                serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
                 serializer_headquarter.is_valid(raise_exception=True)
                 serializer_headquarter.save()
         professional
         return professional
+
+
+class ServiceProfessionalSerializer(serializers.Serializer):
+    """Proffesional schedule serializer."""
+
+    service = serializers.DictField(required=True)
+
+    def create(self, validated_data):
+        sede = int(self.context.get("sede"))
+        professional = self.context.get("professional")
+        data_service = validated_data.get("service")
+        # Create service
+        service = Service.objects.create(**data_service)
+        service.sedes.set([sede])
+        # Create professional service
+        professional_taken = Professional.objects.filter(pk=professional).last()
+        if professional_taken:
+            professional_taken.services.set([service])
+        import ipdb
+
+        ipdb.set_trace()
+        return service
