@@ -31,7 +31,7 @@ certificatesResolvers:
 http:
   routers:
     web-secure-router:
-      rule: 'Host(`https://api.kumbio.com`)'
+      rule: 'Host(`api.kumbio.com`)'
       entryPoints:
         - web-secure
       middlewares:
