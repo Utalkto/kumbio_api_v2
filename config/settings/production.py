@@ -66,7 +66,6 @@ STORAGES = {
         "BACKEND": "kumbio_api_v2.utils.storages.StaticS3Storage",
     },
 }
-COLLECTFAST_STRATEGY = "collectfast.strategies.boto3.Boto3Strategy"
 # STATIC_URL = f"https://{aws_s3_domain}/static/"
 # # MEDIA
 # # ------------------------------------------------------------------------------
