@@ -58,11 +58,6 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool("DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", def
 
 # # STATIC
 # # ------------------------
-STORAGES = {
-    "default": {
-        "BACKEND": "kumbio_api_v2.utils.storages.MediaS3Storage",
-    },
-}
 
 # EMAIL
 # ------------------------------------------------------------------------------
