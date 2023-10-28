@@ -106,10 +106,6 @@ ANYMAIL = {
     "POSTMARK_API_URL": env("POSTMARK_API_URL", default="https://api.postmarkapp.com/"),
 }
 
-# Collectfast
-# ------------------------------------------------------------------------------
-# https://github.com/antonagestam/collectfast#installation
-INSTALLED_APPS = ["collectfast"] + INSTALLED_APPS  # noqa: F405
 
 # LOGGING
 # ------------------------------------------------------------------------------
