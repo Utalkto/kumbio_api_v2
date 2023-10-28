@@ -86,15 +86,15 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool("DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", def
 # aws_s3_domain = AWS_S3_CUSTOM_DOMAIN or f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 # # STATIC
 # # ------------------------
-# STORAGES = {
-#     "default": {
-#         "BACKEND": "kumbio_api_v2.utils.storages.MediaS3Storage",
-#     },
-#     "staticfiles": {
-#         "BACKEND": "kumbio_api_v2.utils.storages.StaticS3Storage",
-#     },
-# }
-# COLLECTFAST_STRATEGY = "collectfast.strategies.boto3.Boto3Strategy"
+STORAGES = {
+    "default": {
+        "BACKEND": "kumbio_api_v2.utils.storages.MediaS3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "kumbio_api_v2.utils.storages.StaticS3Storage",
+    },
+}
+COLLECTFAST_STRATEGY = "collectfast.strategies.boto3.Boto3Strategy"
 # STATIC_URL = f"https://{aws_s3_domain}/static/"
 # # MEDIA
 # # ------------------------------------------------------------------------------
