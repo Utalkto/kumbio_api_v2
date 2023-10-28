@@ -61,11 +61,11 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool("DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", def
 # https://django-storages.readthedocs.io/en/latest/#installation
 INSTALLED_APPS += ["storages"]  # noqa: F405
 # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
-AWS_ACCESS_KEY_ID = env("DJANGO_AWS_ACCESS_KEY_ID")
+AWS_ACCESS_KEY_ID = env("DJANGO_AWS_ACCESS_KEY_ID", default=None)
 # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
-AWS_SECRET_ACCESS_KEY = env("DJANGO_AWS_SECRET_ACCESS_KEY")
+AWS_SECRET_ACCESS_KEY = env("DJANGO_AWS_SECRET_ACCESS_KEY", default=None)
 # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
-AWS_STORAGE_BUCKET_NAME = env("DJANGO_AWS_STORAGE_BUCKET_NAME")
+AWS_STORAGE_BUCKET_NAME = env("DJANGO_AWS_STORAGE_BUCKET_NAME", default=None)
 # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
 AWS_QUERYSTRING_AUTH = False
 # DO NOT change these unless you know what you're doing.
@@ -129,7 +129,7 @@ INSTALLED_APPS += ["anymail"]  # noqa: F405
 # https://anymail.readthedocs.io/en/stable/esps/postmark/
 EMAIL_BACKEND = "anymail.backends.postmark.EmailBackend"
 ANYMAIL = {
-    "POSTMARK_SERVER_TOKEN": env("POSTMARK_SERVER_TOKEN"),
+    "POSTMARK_SERVER_TOKEN": env("POSTMARK_SERVER_TOKEN", default=None),
     "POSTMARK_API_URL": env("POSTMARK_API_URL", default="https://api.postmarkapp.com/"),
 }
 
@@ -178,7 +178,7 @@ LOGGING = {
 
 # Sentry
 # ------------------------------------------------------------------------------
-SENTRY_DSN = env("SENTRY_DSN")
+SENTRY_DSN = env("SENTRY_DSN", default=None)
 SENTRY_LOG_LEVEL = env.int("DJANGO_SENTRY_LOG_LEVEL", logging.INFO)
 
 sentry_logging = LoggingIntegration(
