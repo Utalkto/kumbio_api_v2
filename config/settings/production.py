@@ -66,12 +66,6 @@ STORAGES = {
         "BACKEND": "kumbio_api_v2.utils.storages.StaticS3Storage",
     },
 }
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
-# STATIC_URL = f"https://{aws_s3_domain}/static/"
-# # MEDIA
-# # ------------------------------------------------------------------------------
-# MEDIA_URL = f"https://{aws_s3_domain}/media/"
 
 # EMAIL
 # ------------------------------------------------------------------------------
