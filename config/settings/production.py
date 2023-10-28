@@ -62,9 +62,6 @@ STORAGES = {
     "default": {
         "BACKEND": "kumbio_api_v2.utils.storages.MediaS3Storage",
     },
-    "staticfiles": {
-        "BACKEND": "kumbio_api_v2.utils.storages.StaticS3Storage",
-    },
 }
 
 # EMAIL
