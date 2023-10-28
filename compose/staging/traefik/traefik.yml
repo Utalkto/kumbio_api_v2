@@ -42,7 +42,7 @@ http:
         certResolver: letsencrypt
 
     flower-secure-router:
-      rule: 'Host(`https://dev.api.kumbio.com/`)'
+      rule: 'Host(`dev.api.kumbio.com`)'
       entryPoints:
         - flower
       service: flower
