@@ -56,7 +56,7 @@ jobs:
     if: ${{ github.event_name == 'push' }}
     steps:
       - name: Deployment to qa
-        uses: fifsky/ssh-action@qa
+        uses: fifsky/ssh-action@master
         if : ${{ github.ref == 'refs/heads/qa' }}
         with:
           command: |
