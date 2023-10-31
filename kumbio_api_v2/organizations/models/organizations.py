@@ -15,7 +15,7 @@ class Organization(KumbioModel):
 
     name = models.CharField(max_length=255)
 
-    sector = models.ForeignKey("Sector", on_delete=models.CASCADE, related_name="organization_sectors")
+    sub_sector = models.ForeignKey("SubSector", on_delete=models.CASCADE, related_name="organization_sectors", null=True, blank=True)
 
     description = models.TextField()
 

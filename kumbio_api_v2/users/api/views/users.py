@@ -13,9 +13,10 @@ from kumbio_api_v2.users.api.serializers import UserLoginSerializer, UserModelSe
 
 # Models
 from kumbio_api_v2.users.models import User
+from kumbio_api_v2.organizations.models import Sector
 
 
-class UserViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+class UserViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     """User view set.
 
     Handle sign up, login and account verification.
@@ -36,8 +37,6 @@ class UserViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.G
     def get_permissions(self):
         """Assign permissions based on action."""
         if self.action in ["signup", "login"]:
-            permissions = [AllowAny]
-        elif self.action in ["retrieve", "update", "partial_update", "profile"]:
             permissions = [AllowAny]
         else:
             permissions = [IsAuthenticated]
@@ -68,5 +67,6 @@ class UserViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.G
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = serializer.save()
+        user, token = serializer.save()
+        data = {"user": UserModelSerializer(user).data, "access_token": token}
         return Response(data, status=status.HTTP_201_CREATED)
