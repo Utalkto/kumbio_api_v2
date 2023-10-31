@@ -49,7 +49,7 @@ jobs:
 
       - name: Tear down the Stack
         run: docker compose -f local.yml down
-  
+
   deploy:
     runs-on: ubuntu-latest
     needs: [linter, pytest]
