@@ -40,7 +40,7 @@ def update_site_forward(apps, schema_editor):
     _update_or_create_site_with_sequence(
         Site,
         schema_editor.connection,
-        "https://api.kumbio.com",
+        "dev2.api.kumbio.com",
         "kumbio_api_v2",
     )
 

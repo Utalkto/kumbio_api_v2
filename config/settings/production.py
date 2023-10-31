@@ -165,7 +165,7 @@ sentry_sdk.init(
 # -------------------------------------------------------------------------------
 # Tools that generate code samples can use SERVERS to point to the correct domain
 SPECTACULAR_SETTINGS["SERVERS"] = [  # noqa: F405
-    {"url": "https://https://api.kumbio.com", "description": "Production server"},
+    {"url": "https://dev2.api.kumbio.com", "description": "Production server"},
 ]
 # Your stuff...
 # ------------------------------------------------------------------------------
