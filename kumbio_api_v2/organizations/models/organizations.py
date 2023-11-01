@@ -15,13 +15,15 @@ class Organization(KumbioModel):
 
     name = models.CharField(max_length=255)
 
-    sub_sector = models.ForeignKey("SubSector", on_delete=models.CASCADE, related_name="organization_sectors", null=True, blank=True)
+    sub_sector = models.ForeignKey(
+        "SubSector", on_delete=models.CASCADE, related_name="organization_sectors", null=True, blank=True
+    )
 
     description = models.TextField()
 
     country = models.ForeignKey("Country", on_delete=models.CASCADE, related_name="organization_country")
 
-    currency = models.CharField("Moneda",max_length=120, default=None, null=True, blank=True)
+    currency = models.CharField("Moneda", max_length=120, default=None, null=True, blank=True)
 
     how_we_met = models.CharField("Como nos conocio", max_length=255, null=True, blank=True)
 

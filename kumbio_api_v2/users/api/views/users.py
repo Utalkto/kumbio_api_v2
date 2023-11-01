@@ -13,7 +13,6 @@ from kumbio_api_v2.users.api.serializers import UserLoginSerializer, UserModelSe
 
 # Models
 from kumbio_api_v2.users.models import User
-from kumbio_api_v2.organizations.models import Sector
 
 
 class UserViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):

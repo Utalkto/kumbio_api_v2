@@ -24,11 +24,12 @@ class OrganizationModelSerializer(serializers.ModelSerializer):
 class SubSectorModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubSector
-        fields = ('name', 'pk')
+        fields = ("name", "pk")
+
 
 class SectorModelSerializer(serializers.ModelSerializer):
     sub_sectors = SubSectorModelSerializer(many=True, read_only=True)
 
     class Meta:
         model = Sector
-        fields = ('name', "sub_sectors")
+        fields = ("name", "sub_sectors")
