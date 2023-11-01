@@ -124,7 +124,4 @@ class ServiceProfessionalSerializer(serializers.Serializer):
         professional_taken = Professional.objects.filter(pk=professional).last()
         if professional_taken:
             professional_taken.services.set([service])
-        import ipdb
-
-        ipdb.set_trace()
         return service

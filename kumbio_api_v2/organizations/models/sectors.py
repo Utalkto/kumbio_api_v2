@@ -17,7 +17,7 @@ class Sector(KumbioModel):
         verbose_name = "Sector"
         verbose_name_plural = "Sectores"
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.name}"
 
 
@@ -36,3 +36,6 @@ class SubSector(KumbioModel):
     class Meta:
         verbose_name = "Sub Sector"
         verbose_name_plural = "Sub Sectores"
+
+    def __str__(self):
+        return f"{self.name}"

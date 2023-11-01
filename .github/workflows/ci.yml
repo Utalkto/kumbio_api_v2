@@ -7,11 +7,11 @@ env:
 
 on:
   pull_request:
-    branches: ['master', 'main']
+    branches: ['master', 'main', 'qa']
     paths-ignore: ['docs/**']
 
   push:
-    branches: ['master', 'main']
+    branches: ['master', 'main', 'qa']
     paths-ignore: ['docs/**']
 
 concurrency:
@@ -49,3 +49,18 @@ jobs:
 
       - name: Tear down the Stack
         run: docker compose -f local.yml down
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [linter, pytest]
+    if: ${{ github.event_name == 'push' }}
+    steps:
+      - name: Deployment to qa
+        uses: fifsky/ssh-action@master
+        if : ${{ github.ref == 'refs/heads/qa' }}
+        with:
+          command: |
+            bash "./deploy.sh"
+          host: ${{ secrets.HOST }}
+          user: ${{secrets.USER}}
+          key: ${{ secrets.PRIVATE_KEY}}

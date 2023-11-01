@@ -63,7 +63,7 @@ class UserSignUpSerializer(serializers.Serializer):
         country = data.get("country")
         country = Country.objects.filter(slug_name=country).first()
         # Create organization
-        organization = Organization.objects.create(name=organization_name, sector_id=sector, country=country)
+        organization = Organization.objects.create(name=organization_name, sub_sector_id=sector, country=country)
         # Create membreship
         OrganizationMembership.objects.create(
             membership=MembershipType.objects.get(membership_type="PREMIUM"),
@@ -76,10 +76,17 @@ class UserSignUpSerializer(serializers.Serializer):
             organization=organization,
         )
         # Create user
-        User.objects.create_user(email=email, password=password, is_owner=True)
+        user = User.objects.create_user(email=email, password=password, is_owner=True)
+        token = generate_auth_token(user)
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        email = payload.get("user")
+        if isinstance(email, Token):
+            token = email
+            return token.key, token.user
+        token = user.get_autorized_token
         data.pop("password")
         data["sede_pk"] = sede.pk
-        return data
+        return user, token
 
 
 class UserLoginSerializer(serializers.Serializer):

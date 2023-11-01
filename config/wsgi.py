@@ -18,6 +18,7 @@ import sys
 from pathlib import Path
 
 from django.core.wsgi import get_wsgi_application
+from whitenoise import WhiteNoise
 
 # This allows easy placement of apps within the interior
 # kumbio_api_v2 directory.
@@ -33,6 +34,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.production")
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
 application = get_wsgi_application()
+application = WhiteNoise(application, root="/app/staticfiles/")
 # Apply WSGI middleware here.
 # from helloworld.wsgi import HelloWorldApplication
 # application = HelloWorldApplication(application)

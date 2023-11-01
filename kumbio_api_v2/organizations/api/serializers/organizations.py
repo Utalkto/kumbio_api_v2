@@ -5,7 +5,7 @@
 from rest_framework import serializers
 
 # Models
-from kumbio_api_v2.organizations.models import Organization
+from kumbio_api_v2.organizations.models import Organization, Sector, SubSector
 
 
 class OrganizationModelSerializer(serializers.ModelSerializer):
@@ -19,3 +19,17 @@ class OrganizationModelSerializer(serializers.ModelSerializer):
             "name",
             "description",
         )
+
+
+class SubSectorModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubSector
+        fields = ("name", "pk")
+
+
+class SectorModelSerializer(serializers.ModelSerializer):
+    sub_sectors = SubSectorModelSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Sector
+        fields = ("name", "sub_sectors")
