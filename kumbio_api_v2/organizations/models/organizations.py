@@ -25,8 +25,6 @@ class Organization(KumbioModel):
 
     currency = models.CharField("Moneda", max_length=120, default=None, null=True, blank=True)
 
-    how_we_met = models.CharField("Como nos conocio", max_length=255, null=True, blank=True)
-
     class Meta:
         """Meta class."""
 
