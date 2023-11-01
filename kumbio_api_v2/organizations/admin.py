@@ -58,7 +58,7 @@ class OrganizationAdmin(admin.ModelAdmin):
 
     list_display = ["name", "sub_sector", "country"]
     search_fields = ["name"]
-    list_filter = ["sub_sector", "country"]
+    list_filter = ["sub_sector", "country", "how_we_met"]
     inlines = [OrganizationSedeInline, OrganizationMembershipInline]
 
 
