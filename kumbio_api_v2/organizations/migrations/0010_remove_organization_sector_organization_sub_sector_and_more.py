@@ -6,7 +6,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("organizations", "0008_country_alter_organization_country"),
+        ("organizations", "0009_alter_country_optional_prefix"),
     ]
 
     operations = [
