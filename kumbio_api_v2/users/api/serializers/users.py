@@ -49,6 +49,7 @@ class UserSignUpSerializer(serializers.Serializer):
     """
 
     organization_name = serializers.CharField(max_length=255)
+    description = serializers.CharField(required=False)
     sector = serializers.IntegerField()
     email = serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all())])
     password = serializers.CharField(min_length=8, max_length=64)
@@ -84,9 +85,8 @@ class UserSignUpSerializer(serializers.Serializer):
             token = email
             return token.key, token.user
         token = user.get_autorized_token
-        data.pop("password")
-        data["sede_pk"] = sede.pk
-        return user, token
+        sede_pk = sede.pk
+        return user, token, sede_pk
 
 
 class UserLoginSerializer(serializers.Serializer):

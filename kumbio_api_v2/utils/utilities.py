@@ -12,7 +12,6 @@ def generate_auth_token(user, **kwargs):
     expiration_date = timezone.localtime() + timedelta(days=2)
     payload = {
         "user": user.email,
-        # UTC format
         "exp": int(expiration_date.timestamp()),
         "type": "login",
     }
