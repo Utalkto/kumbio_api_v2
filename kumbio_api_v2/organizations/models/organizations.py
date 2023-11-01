@@ -21,7 +21,9 @@ class Organization(KumbioModel):
 
     country = models.ForeignKey("Country", on_delete=models.CASCADE, related_name="organization_country")
 
-    currency = models.CharField(max_length=120, default=None, null=True, blank=True)
+    currency = models.CharField("Moneda",max_length=120, default=None, null=True, blank=True)
+
+    how_we_met = models.CharField("Como nos conocio", max_length=255, null=True, blank=True)
 
     class Meta:
         """Meta class."""
@@ -30,7 +32,7 @@ class Organization(KumbioModel):
         verbose_name_plural = "Organizations"
 
     def __str__(self):
-        return f"Organization {self.name} - {self.sector}"
+        return f"Organization {self.name} - {self.sub_sector}"
 
 
 class OrganizationMembership(KumbioModel):
@@ -41,10 +43,10 @@ class OrganizationMembership(KumbioModel):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="organization_membership")
 
     is_active = models.BooleanField(
-        "Active", default=False, help_text="Set to true when the user have an active membership."
+        "Esta activa", default=False, help_text="Set to true when the user have an active membership."
     )
-    start_date = models.DateField("Iinit date", null=True, blank=True)
-    expiration = models.DateField("Expiration date", auto_now=False, auto_now_add=False)
+    start_date = models.DateField("Inicio de membresía", null=True, blank=True)
+    expiration = models.DateField("Expiración de membresía", auto_now=False, auto_now_add=False)
 
     def save(self, *args, **kwargs):
         if not self.start_date or not self.expiration:
