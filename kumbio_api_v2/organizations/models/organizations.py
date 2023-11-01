@@ -49,6 +49,7 @@ class OrganizationMembership(KumbioModel):
     )
     start_date = models.DateField("Inicio de membresía", null=True, blank=True)
     expiration = models.DateField("Expiración de membresía", auto_now=False, auto_now_add=False)
+    days_duration = models.IntegerField(default=30)
 
     def save(self, *args, **kwargs):
         if not self.start_date or not self.expiration:
