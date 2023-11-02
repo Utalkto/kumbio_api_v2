@@ -49,7 +49,6 @@ class UserSignUpSerializer(serializers.Serializer):
     """
 
     organization_name = serializers.CharField(max_length=255)
-    description = serializers.CharField(required=False)
     sector = serializers.IntegerField()
     email = serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all())])
     password = serializers.CharField(min_length=8, max_length=64)
