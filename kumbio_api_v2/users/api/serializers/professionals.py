@@ -3,16 +3,15 @@
 # Django
 
 
-
 # Django REST Framework
 from rest_framework import serializers
+
+# Serializers
+from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
 
 # Models
 from kumbio_api_v2.organizations.models import Professional, ProfessionalSchedule, Sede
 from kumbio_api_v2.users.models import User
-
-# Serializers
-from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
 
 
 class ProfessionalScheduleModelSerializer(serializers.ModelSerializer):
@@ -37,17 +36,13 @@ class ProfessionalSerializer(serializers.Serializer):
     def validate_phone_number(self, phone_number):
         """Check if phone number is unique."""
         if User.objects.filter(phone_number=phone_number).exists():
-            raise serializers.ValidationError(
-                'Ya existe un usuario registrado con ese número de teléfono.'
-            )
+            raise serializers.ValidationError("Ya existe un usuario registrado con ese número de teléfono.")
         return phone_number
 
     def validate_email(self, email):
         """Check if phone number is unique."""
         if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError(
-                'Ya existe un usuario registrado con este email.'
-            )
+            raise serializers.ValidationError("Ya existe un usuario registrado con este email.")
         return email
 
     def create(self, validated_data):
@@ -70,14 +65,14 @@ class ProfessionalSerializer(serializers.Serializer):
         else:
             user = User.objects.create_user(
                 phone_number=phone_number,
-                first_name = first_name,
-                email = email,
-                last_name = last_name,
-                is_professional = True,
+                first_name=first_name,
+                email=email,
+                last_name=last_name,
+                is_professional=True,
             )
         if sede_pk:
             sede = Sede.objects.get(id=sede_pk)
-        Professional.objects.create(user=user, sede = sede, is_user = True)
+        Professional.objects.create(user=user, sede=sede, is_user=True)
         return validated_data
 
 

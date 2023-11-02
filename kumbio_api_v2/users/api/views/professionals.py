@@ -6,15 +6,13 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-# Serializers
-from kumbio_api_v2.users.api.serializers import (
-    ProfessionalScheduleSerializer,
-    ProfessionalSerializer
-)
 from kumbio_api_v2.organizations.api.serializers import ServiceProfessionalSerializer
 
 # Models
-from kumbio_api_v2.organizations.models import Sede, Professional
+from kumbio_api_v2.organizations.models import Professional, Sede
+
+# Serializers
+from kumbio_api_v2.users.api.serializers import ProfessionalScheduleSerializer, ProfessionalSerializer
 
 
 class ProfesionalViewset(
