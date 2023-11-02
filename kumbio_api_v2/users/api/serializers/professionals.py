@@ -1,5 +1,8 @@
 """Professionals serializers."""
 
+# Django
+
+
 
 # Django REST Framework
 from rest_framework import serializers
@@ -41,21 +44,20 @@ class ProfessionalSerializer(serializers.Serializer):
 
     def validate_email(self, email):
         """Check if phone number is unique."""
-        if User.objects.filter(phone_number=email).exists():
+        if User.objects.filter(email=email).exists():
             raise serializers.ValidationError(
                 'Ya existe un usuario registrado con este email.'
             )
         return email
 
-    def create(self, data):
+    def create(self, validated_data):
         request = self.context.get("request")
         tutorial = self.context.get("tutorial")
-        sede = self.context.get("sede")
-        first_name = data.get("first_name")
-        last_name = data.get("last_name")
-        phone_number = data.get("phone_number")
-        email = data.get("email")
-        sede_pk = data.get("sede_pk")
+        first_name = validated_data.get("first_name")
+        last_name = validated_data.get("last_name")
+        phone_number = validated_data.get("phone_number")
+        email = validated_data.get("email")
+        sede_pk = validated_data.get("sede_pk")
         # Create user
         if tutorial:
             user = request.user
@@ -66,14 +68,17 @@ class ProfessionalSerializer(serializers.Serializer):
             user.is_professional = True
             user.save()
         else:
-            user, _ = User.objects.update_or_create(
+            user = User.objects.create_user(
                 phone_number=phone_number,
-                defaults={"first_name": first_name, "email": email, "last_name": last_name, "is_professional": True},
+                first_name = first_name,
+                email = email,
+                last_name = last_name,
+                is_professional = True,
             )
         if sede_pk:
             sede = Sede.objects.get(id=sede_pk)
-        Professional.objects.update_or_create(user=user, defaults={"sede": sede, "is_user": True})
-        return data
+        Professional.objects.create(user=user, sede = sede, is_user = True)
+        return validated_data
 
 
 class ProfessionalScheduleSerializer(serializers.Serializer):
