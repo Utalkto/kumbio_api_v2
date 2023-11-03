@@ -27,9 +27,18 @@ class Professional(KumbioModel):
 
 
 class ProfessionalSchedule(KumbioModel):
-    """Headquarters schedule."""
+    """Professional schedule."""
 
-    day = models.CharField(max_length=10, choices=DaysChoices.choices, default=DaysChoices.MONDAY)
     professional = models.ForeignKey(Professional, on_delete=models.CASCADE, related_name="professional_schedule")
+    day = models.CharField(max_length=10, choices=DaysChoices.choices, default=DaysChoices.MONDAY)
+    hour_init = models.TimeField()
+    hour_end = models.TimeField()
+
+
+class RestProfessionalSchedule(KumbioModel):
+    """Rest professional schedule."""
+
+    professional = models.ForeignKey(Professional, on_delete=models.CASCADE, related_name="rest_professional_schedule")
+    day = models.CharField(max_length=10, choices=DaysChoices.choices, default=DaysChoices.MONDAY)
     hour_init = models.TimeField()
     hour_end = models.TimeField()
