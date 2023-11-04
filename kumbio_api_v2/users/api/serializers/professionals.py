@@ -8,10 +8,9 @@ from rest_framework import serializers
 
 # Serializers
 from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
-from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
 
 # Models
-from kumbio_api_v2.organizations.models import Professional, ProfessionalSchedule, Sede
+from kumbio_api_v2.organizations.models import Professional, ProfessionalSchedule, RestProfessionalSchedule, Sede
 from kumbio_api_v2.users.models import User
 
 
@@ -24,6 +23,15 @@ class ProfessionalScheduleModelSerializer(serializers.ModelSerializer):
         model = ProfessionalSchedule
         fields = "__all__"
 
+
+class RestProfessionalScheduleModelSerializer(serializers.ModelSerializer):
+    """Service model serializer."""
+
+    class Meta:
+        """Meta class."""
+
+        model = RestProfessionalSchedule
+        fields = "__all__"
 
 
 class ProfessionalSerializer(serializers.Serializer):
@@ -81,16 +89,20 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
     """Proffesional schedule serializer."""
 
     professional_schedule = serializers.ListField(child=serializers.DictField(required=True))
-    sede_pk = serializers.IntegerField()
+    sede_pk = serializers.IntegerField(required=False)
 
     def create(self, validated_data):
         professional = self.context.get("professional")
+        rest_professional = self.context.get("rest")
         tutorial = self.context.get("tutorial")
         professional_schedule = validated_data.get("professional_schedule")
         sede_pk = validated_data.get("sede_pk")
+        serializer = (
+            RestProfessionalScheduleModelSerializer if rest_professional else ProfessionalScheduleModelSerializer
+        )
         for schedule in professional_schedule:
-            schedule["professional"] = professional
-            serializer_professional = ProfessionalScheduleModelSerializer(data=schedule)
+            schedule["professional"] = professional.pk if rest_professional else professional
+            serializer_professional = serializer(data=schedule)
             serializer_professional.is_valid(raise_exception=True)
             serializer_professional.save()
             if tutorial:
@@ -100,9 +112,3 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
                 serializer_headquarter.is_valid(raise_exception=True)
                 serializer_headquarter.save()
         return validated_data
-    
-
-class ProfessionalScheduleAvailableSerializer(serializers.Serializer):
-    """Proffesional available schedule serializer."""
-
-    service_pk = serializers.IntegerField()

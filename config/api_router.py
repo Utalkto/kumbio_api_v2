@@ -4,6 +4,7 @@ from django.conf import settings
 # REST framework
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
+from kumbio_api_v2.appointments.api import views as appointment_views
 from kumbio_api_v2.organizations.api import views as organization_views
 
 # Views
@@ -19,9 +20,7 @@ router.register(r"sectors", organization_views.SectorViewSet, basename="sectors"
 router.register(r"organizations", organization_views.OrganizationViewSet, basename="organizations")
 router.register(r"organizations/(?P<organization_pk>[^/.]+)/sedes", organization_views.SedeViewset, basename="sedes")
 router.register(r"profesionals", user_views.ProfesionalViewset, basename="proffesionals")
-# router.register(
-#     r"sede/(?P<sede_pk>[^/.]+)/profesional", user_views.ProfesionalViewset, basename="proffesionals"
-# )
+router.register(r"appointments", appointment_views.AppointmentProfesionalViewset, basename="appointments")
 
 
 app_name = "api"

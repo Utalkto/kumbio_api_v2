@@ -1,5 +1,10 @@
 """Professionals views."""
 
+# from datetime import datetime
+
+# # Django
+# from django.db.models import Q, Subquery
+
 # Django REST Framework
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
@@ -12,7 +17,7 @@ from kumbio_api_v2.organizations.api.serializers import ServiceProfessionalSeria
 from kumbio_api_v2.organizations.models import Professional, Sede
 
 # Serializers
-from kumbio_api_v2.users.api.serializers import ProfessionalScheduleSerializer, ProfessionalSerializer, ProfessionalScheduleAvailableSerializer
+from kumbio_api_v2.users.api.serializers import ProfessionalScheduleSerializer, ProfessionalSerializer
 
 
 class ProfesionalViewset(
@@ -25,7 +30,9 @@ class ProfesionalViewset(
 ):
     lookup_field = "pk"
     permission_classes = [IsAuthenticated]
-    queryset = Professional.objects.all().prefetch_related('professional_schedule')
+    queryset = Professional.objects.all().prefetch_related(
+        "professional_schedule", "rest_professional_schedule", "professional_appointments"
+    )
 
     def dispatch(self, request, *args, **kwargs):
         """Verify that the user exists."""
@@ -35,12 +42,10 @@ class ProfesionalViewset(
 
     def get_serializer_class(self):
         """Return serializer based on action."""
-        if self.action in ["schedule"]:
+        if self.action in ["schedule", "rest_professional"]:
             return ProfessionalScheduleSerializer
         if self.action in ["service"]:
             return ServiceProfessionalSerializer
-        if self.action in ["available_schedule"]:
-            return ProfessionalScheduleAvailableSerializer
         else:
             return ProfessionalSerializer
 
@@ -97,16 +102,39 @@ class ProfesionalViewset(
         serializer.save()
         data = serializer.data
         return Response(data, status=status.HTTP_200_OK)
-    
-    @action(detail=True, methods=["GET"], url_path="available-schedule")
-    def available_schedule(self, request, *args, **kwargs):
+
+    @action(detail=True, methods=["POST"], url_path="rest-professional")
+    def rest_professional(self, request, *args, **kwargs):
         """Add professional service."""
         instance = self.get_object()
         serializer = self.get_serializer(
             data=request.data,
-            context={"professional": instance},
+            context={"professional": instance, "rest": True},
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         data = serializer.data
         return Response(data, status=status.HTTP_200_OK)
+
+    # @action(detail=True, methods=["GET"], url_path="available-schedule")
+    # def available_schedule(self, request, *args, **kwargs):
+    #     """Add professional service."""
+    #     instance = self.get_object()
+    #     date = request.GET.get("date")
+    #     date = datetime.strptime(date, "%Y-%m-%d")
+    #     day_of_week = date.strftime('%A').upper()
+    #     professional_schedule = instance.professional_schedule.filter(day=day_of_week).values_list("hour_init")
+    #     professional_appointments = instance.professional_appointments.filter(
+    #       start_date__date=date).values_list("start_date__time")
+    #     professional_rest = instance.rest_professional_schedule.filter(
+    #         day=day_of_week,
+    #         hour_init__isnull=False,
+    #         hour_end__isnull=False,
+    #     ).values('hour_init', 'hour_end')
+    #     time_available = professional_schedule.exclude(
+    #         Q(hour_init__in=Subquery(professional_appointments.values('start_date__time'))) |
+    #         Q(hour_end__in=Subquery(professional_appointments.values('start_date__time'))) |
+    #         Q(hour_init__in=Subquery(professional_rest.values('hour_init'))) |
+    #         Q(hour_end__in=Subquery(professional_rest.values('hour_end'))
+    #     ))
+    #     return Response("ok", status=status.HTTP_200_OK)

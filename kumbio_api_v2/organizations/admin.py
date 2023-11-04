@@ -10,11 +10,11 @@ from kumbio_api_v2.organizations.models import (
     OrganizationMembership,
     Professional,
     ProfessionalSchedule,
+    RestProfessionalSchedule,
     Sector,
     Sede,
     Service,
     SubSector,
-    RestProfessionalSchedule
 )
 
 

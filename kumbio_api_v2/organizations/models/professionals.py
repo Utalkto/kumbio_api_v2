@@ -34,11 +34,16 @@ class ProfessionalSchedule(KumbioModel):
     hour_init = models.TimeField()
     hour_end = models.TimeField()
 
+    def __str__(self):
+        return f"Schedule {self.professional} - {self.day}"
+
 
 class RestProfessionalSchedule(KumbioModel):
     """Rest professional schedule."""
 
     professional = models.ForeignKey(Professional, on_delete=models.CASCADE, related_name="rest_professional_schedule")
+    on_vacations = models.BooleanField(default=False)
     day = models.CharField(max_length=10, choices=DaysChoices.choices, default=DaysChoices.MONDAY)
     hour_init = models.TimeField()
     hour_end = models.TimeField()
+    description = models.TextField(max_length=255, blank=True, null=True)

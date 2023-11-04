@@ -1,10 +1,14 @@
 """appointments views."""
 
 # Django REST Framework
-from rest_framework import mixins, status, viewsets
-from rest_framework.decorators import action
+from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
+
+# Serializers
+from kumbio_api_v2.appointments.api.serializers.appointments import AppointmentSerializer
+
+# Models
+from kumbio_api_v2.appointments.models import Appointment
 
 
 class AppointmentProfesionalViewset(
@@ -15,3 +19,7 @@ class AppointmentProfesionalViewset(
     mixins.RetrieveModelMixin,
     viewsets.GenericViewSet,
 ):
+    lookup_field = "pk"
+    permission_classes = [IsAuthenticated]
+    queryset = Appointment.objects.all().prefetch_related("professional", "sede", "service")
+    serializer_class = AppointmentSerializer

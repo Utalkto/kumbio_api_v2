@@ -5,5 +5,12 @@
 from rest_framework import serializers
 
 # Models
-from kumbio_api_v2.organizations.models import HeadquarterSchedule, Professional, ProfessionalSchedule, Sede, Service
-from kumbio_api_v2.users.models import User
+from kumbio_api_v2.appointments.models import Appointment
+
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    """Appointment model serializer."""
+
+    class Meta:
+        model = Appointment
+        fields = "__all__"
