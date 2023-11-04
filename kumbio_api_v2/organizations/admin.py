@@ -10,6 +10,7 @@ from kumbio_api_v2.organizations.models import (
     OrganizationMembership,
     Professional,
     ProfessionalSchedule,
+    RestProfessionalSchedule,
     Sector,
     Sede,
     Service,
@@ -49,6 +50,11 @@ class HeadquarterScheduleInline(admin.TabularInline):
 
 class ProfessionalScheduleInline(admin.TabularInline):
     model = ProfessionalSchedule
+    extra = 0
+
+
+class RestProfessionalScheduleInline(admin.TabularInline):
+    model = RestProfessionalSchedule
     extra = 0
 
 
@@ -107,7 +113,7 @@ class ProfessionalAdmin(admin.ModelAdmin):
 
     list_display = ["user", "sede"]
     autocomplete_fields = ["services"]
-    inlines = [ProfessionalScheduleInline]
+    inlines = [ProfessionalScheduleInline, RestProfessionalScheduleInline]
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "servicios":
@@ -125,3 +131,10 @@ class CountryAdmin(admin.ModelAdmin):
     list_display = ["name", "slug_name", "phone_prefix"]
     search_fields = ["name", "phone_prefix"]
     list_filter = ["name", "phone_prefix"]
+
+
+# @admin.register(RestProfessionalSchedule)
+# class RestProfessionalScheduleAdmin(admin.ModelAdmin):
+#     """Service sede model admin."""
+
+#     list_display = ["professional"]
