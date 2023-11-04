@@ -112,16 +112,15 @@ class ServiceProfessionalSerializer(serializers.Serializer):
     """Proffesional schedule serializer."""
 
     service = serializers.DictField(required=True)
+    sede_pk = serializers.IntegerField(required=False)
 
     def create(self, validated_data):
-        sede = int(self.context.get("sede"))
-        professional = self.context.get("professional")
+        sede_pk = validated_data.get("sede_pk")
         data_service = validated_data.get("service")
+        professional = self.context.get("professional")
         # Create service
         service = Service.objects.create(**data_service)
-        service.sedes.set([sede])
-        # Create professional service
-        professional_taken = Professional.objects.filter(pk=professional).last()
-        if professional_taken:
-            professional_taken.services.set([service])
-        return service
+        service.sedes.set([sede_pk])
+        # Add professional service
+        professional.services.set([service])
+        return validated_data

@@ -84,9 +84,8 @@ class UserSignUpSerializer(serializers.Serializer):
             token = email
             return token.key, token.user
         token = user.get_autorized_token
-        data.pop("password")
-        data["sede_pk"] = sede.pk
-        return user, token
+        sede_pk = sede.pk
+        return user, token, sede_pk
 
 
 class UserLoginSerializer(serializers.Serializer):

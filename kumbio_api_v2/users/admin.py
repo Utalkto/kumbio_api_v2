@@ -34,7 +34,7 @@ class UserAdmin(auth_admin.UserAdmin):
             },
         ],
     ]
-    list_display = ["email", "first_name", "is_owner", "is_client"]
+    list_display = ["email", "first_name", "is_owner", "is_client", "is_professional"]
     search_fields = ["name"]
     ordering = ["id"]
     add_fieldsets = (
