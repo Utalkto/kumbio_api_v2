@@ -83,31 +83,6 @@ class ProfessionalSerializer(serializers.Serializer):
         return data
 
 
-class ProfessionalScheduleSerializer(serializers.Serializer):
-    """Proffesional schedule serializer."""
-
-    professional_schedule = serializers.ListField(child=serializers.DictField(required=True))
-
-    def create(self, validated_data):
-        sede = self.context.get("sede")
-        professional = self.context.get("professional")
-        tutorial = self.context.get("tutorial")
-        professional_schedule = validated_data.get("professional_schedule")
-        for schedule in professional_schedule:
-            schedule["professional"] = professional
-            serializer_professional = ProfessionalScheduleModelSerializer(data=schedule)
-            serializer_professional.is_valid(raise_exception=True)
-            serializer_professional.save()
-            if tutorial:
-                schedule.pop("professional")
-                schedule["sede"] = sede
-                serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
-                serializer_headquarter.is_valid(raise_exception=True)
-                serializer_headquarter.save()
-        professional
-        return professional
-
-
 class ServiceProfessionalSerializer(serializers.Serializer):
     """Proffesional schedule serializer."""
 

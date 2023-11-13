@@ -8,20 +8,11 @@ from rest_framework import serializers
 
 # Serializers
 from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
+from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
 
 # Models
-from kumbio_api_v2.organizations.models import Professional, ProfessionalSchedule, RestProfessionalSchedule, Sede
+from kumbio_api_v2.organizations.models import Professional, RestProfessionalSchedule, Sede
 from kumbio_api_v2.users.models import User
-
-
-class ProfessionalScheduleModelSerializer(serializers.ModelSerializer):
-    """Service model serializer."""
-
-    class Meta:
-        """Meta class."""
-
-        model = ProfessionalSchedule
-        fields = "__all__"
 
 
 class RestProfessionalScheduleModelSerializer(serializers.ModelSerializer):
@@ -37,49 +28,30 @@ class RestProfessionalScheduleModelSerializer(serializers.ModelSerializer):
 class ProfessionalSerializer(serializers.Serializer):
     """Professional model serializer."""
 
-    first_name = serializers.CharField(min_length=2, max_length=255)
-    last_name = serializers.CharField(min_length=2, max_length=255)
-    phone_number = serializers.CharField(max_length=255)
-    email = serializers.EmailField(max_length=255, required=False)
+    user_data = UserModelSerializer()
     sede_pk = serializers.IntegerField(required=False)
-
-    def validate_phone_number(self, phone_number):
-        """Check if phone number is unique."""
-        if User.objects.filter(phone_number=phone_number).exists():
-            raise serializers.ValidationError("Ya existe un usuario registrado con ese número de teléfono.")
-        return phone_number
-
-    def validate_email(self, email):
-        """Check if phone number is unique."""
-        if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError("Ya existe un usuario registrado con este email.")
-        return email
+    service_pk = serializers.IntegerField(required=False)
+    description = serializers.CharField(required=False)
 
     def create(self, validated_data):
         request = self.context.get("request")
         tutorial = self.context.get("tutorial")
-        first_name = validated_data.get("first_name")
-        last_name = validated_data.get("last_name")
-        phone_number = validated_data.get("phone_number")
-        email = validated_data.get("email")
+        user_data = validated_data.get("user_data")
+        user_data["is_professional"] = True
         sede_pk = validated_data.get("sede_pk")
         # Create user
         if tutorial:
             user = request.user
-            user.first_name = first_name
-            user.last_name = last_name
-            user.phone_number = phone_number
-            user.is_professional = True
+            user.first_name = user_data.get("first_name")
+            user.last_name = user_data.get("last_name")
+            user.phone_number = user_data.get("phone_number")
+            user.is_professional = user_data.get("is_professional")
             user.save()
         else:
             user = User.objects.create_user(
-                phone_number=phone_number,
-                first_name=first_name,
-                email=email,
-                last_name=last_name,
-                is_professional=True,
+                **user_data
             )
-        if sede_pk:
+        if sede_pk and user:
             sede = Sede.objects.get(id=sede_pk)
             Professional.objects.create(user=user, sede=sede, is_user=True)
         return validated_data
@@ -97,18 +69,33 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
         tutorial = self.context.get("tutorial")
         professional_schedule = validated_data.get("professional_schedule")
         sede_pk = validated_data.get("sede_pk")
-        serializer = (
-            RestProfessionalScheduleModelSerializer if rest_professional else ProfessionalScheduleModelSerializer
-        )
-        for schedule in professional_schedule:
-            schedule["professional"] = professional.pk if rest_professional else professional
-            serializer_professional = serializer(data=schedule)
-            serializer_professional.is_valid(raise_exception=True)
-            serializer_professional.save()
-            if tutorial:
-                schedule.pop("professional")
-                schedule["sede"] = sede_pk
-                serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
-                serializer_headquarter.is_valid(raise_exception=True)
-                serializer_headquarter.save()
+        # Delete current schedule
+        if rest_professional:
+            professional.rest_professional_schedule.all().delete()
+            for schedule in professional_schedule:
+                day = schedule.get("day")
+                hour_init = schedule.get("hour_init")
+                hour_end = schedule.get("hour_end")
+                professional.rest_professional_schedule.create(
+                    day=day,
+                    hour_init=hour_init,
+                    hour_end=hour_end,
+                )
+        else:
+            professional.professional_schedule.all().delete()
+            for schedule in professional_schedule:
+                day = schedule.get("day")
+                hour_init = schedule.get("hour_init")
+                hour_end = schedule.get("hour_end")
+                professional.professional_schedule.create(
+                    day=day,
+                    hour_init=hour_init,
+                    hour_end=hour_end,
+                )
+                if tutorial:
+                    schedule.pop("professional")
+                    schedule["sede"] = sede_pk
+                    serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
+                    serializer_headquarter.is_valid(raise_exception=True)
+                    serializer_headquarter.save()
         return validated_data
