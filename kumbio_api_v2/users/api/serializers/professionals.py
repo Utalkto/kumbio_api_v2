@@ -11,7 +11,7 @@ from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterSchedul
 from kumbio_api_v2.organizations.api.serializers.services import ProfessioanlServicesModelSerializer
 
 # Models
-from kumbio_api_v2.organizations.models import Professional, RestProfessionalSchedule, Sede, ProfessionalSchedule
+from kumbio_api_v2.organizations.models import Professional, ProfessionalSchedule, RestProfessionalSchedule, Sede
 from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
 from kumbio_api_v2.users.models import User
 
@@ -58,7 +58,7 @@ class ProfessionalModelSerializer(serializers.ModelSerializer):
             serializer = ProfessionalScheduleModelSerializer(item)
             professional_schedule.append(serializer.data)
         return professional_schedule
-    
+
     def get_professional_services(self, obj):
         services = obj.services.all()
         professional_services = []
@@ -143,7 +143,9 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
             serializer_headquarter.is_valid(raise_exception=True)
             serializer_headquarter.save()
         return validated_data
-    
+
     def get(self, validated_data):
-        import ipdb; ipdb.set_trace()
+        import ipdb
+
+        ipdb.set_trace()
         return validated_data

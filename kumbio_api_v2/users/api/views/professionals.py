@@ -18,10 +18,10 @@ from kumbio_api_v2.organizations.models import Professional, Sede
 
 # Serializers
 from kumbio_api_v2.users.api.serializers import (
+    ProfessionalModelSerializer,
     ProfessionalScheduleSerializer,
     ProfessionalSerializer,
-    ProfessionalModelSerializer,
-    RestProfessionalScheduleModelSerializer
+    RestProfessionalScheduleModelSerializer,
 )
 
 
@@ -36,7 +36,8 @@ class ProfesionalViewset(
     lookup_field = "pk"
     permission_classes = [IsAuthenticated]
     queryset = Professional.objects.all().prefetch_related(
-        "professional_schedule", "rest_professional_schedule", "professional_appointments")
+        "professional_schedule", "rest_professional_schedule", "professional_appointments"
+    )
 
     def dispatch(self, request, *args, **kwargs):
         """Verify that the user exists."""
@@ -120,9 +121,7 @@ class ProfesionalViewset(
         """Add professional service."""
         instance = self.get_object()
         request.data["professional"] = instance.pk
-        serializer = self.get_serializer(
-            data=request.data
-        )
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         data = serializer.data

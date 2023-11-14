@@ -30,6 +30,7 @@ class Organization(KumbioModel):
     @property
     def professionals(self):
         from organizations.models.professionals import Professional
+
         return Professional.objects.filter(sede__organization=self)
 
     class Meta:
