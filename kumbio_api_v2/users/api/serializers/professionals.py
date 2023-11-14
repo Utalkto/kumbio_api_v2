@@ -136,16 +136,9 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
                 hour_init_rest=hour_init_rest,
                 hour_end_rest=hour_end_rest,
             )
-        if tutorial:
-            schedule.pop("professional")
-            schedule["sede"] = sede_pk
-            serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
-            serializer_headquarter.is_valid(raise_exception=True)
-            serializer_headquarter.save()
-        return validated_data
-
-    def get(self, validated_data):
-        import ipdb
-
-        ipdb.set_trace()
+            if tutorial:
+                schedule["sede"] = sede_pk
+                serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
+                serializer_headquarter.is_valid(raise_exception=True)
+                serializer_headquarter.save()
         return validated_data

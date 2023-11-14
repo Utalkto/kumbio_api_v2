@@ -33,7 +33,7 @@ class UserModelSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
 
     def get_full_name(self, obj):
-        full_name = obj.get_full_name()
+        full_name = obj.get("first_name") + " " + obj.get("last_name")
         return full_name
 
     def validate_phone_number(self, phone_number):
