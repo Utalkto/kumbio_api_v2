@@ -39,3 +39,22 @@ class SubSector(KumbioModel):
 
     def __str__(self):
         return f"{self.name}"
+
+
+# class SectorProfileHealth(KumbioModel):
+#     """Sector  health profile model."""
+
+#     class BloodType(models.TextChoices):
+#         """
+#         Types of files.
+#         """
+#         A = 'A', 'A'
+#         B = 'B', 'B'
+#         AB = 'AB', 'AB'
+#         O = 'O', 'O'
+
+
+#     sub_sector = models.ForeignKey(SubSector, on_delete=models.CASCADE, related_name="sub_sectors_profile")
+#     blood_type = models.TextField("Tipo de sangre")
+#     initial_weight = models.FloatField("Peso inicial")
+#     initial_height = models.FloatField("Altura inicial")

@@ -17,7 +17,7 @@ from kumbio_api_v2.organizations.api.serializers import ServiceProfessionalSeria
 from kumbio_api_v2.organizations.models import Professional, Sede
 
 # Serializers
-from kumbio_api_v2.users.api.serializers import ProfessionalScheduleSerializer, ProfessionalSerializer
+from kumbio_api_v2.users.api.serializers import ProfessionalScheduleSerializer, ProfessionalSerializer, ProfessionalModelSerializer
 
 
 class ProfesionalViewset(
@@ -45,6 +45,8 @@ class ProfesionalViewset(
             return ProfessionalScheduleSerializer
         if self.action in ["service"]:
             return ServiceProfessionalSerializer
+        if self.action in ["retrieve"]:
+            return ProfessionalModelSerializer
         else:
             return ProfessionalSerializer
 
@@ -55,7 +57,7 @@ class ProfesionalViewset(
         return context
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)

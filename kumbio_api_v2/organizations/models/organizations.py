@@ -27,6 +27,11 @@ class Organization(KumbioModel):
 
     how_you_know_us = models.CharField("Como nos conocio", max_length=120, default=None, null=True, blank=True)
 
+    @property
+    def professionals(self):
+        from organizations.models.professionals import Professional
+        return Professional.objects.filter(sede__organization=self)
+
     class Meta:
         """Meta class."""
 

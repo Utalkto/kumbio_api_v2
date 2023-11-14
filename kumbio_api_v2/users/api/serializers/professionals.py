@@ -8,21 +8,33 @@ from rest_framework import serializers
 
 # Serializers
 from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
-from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
 
 # Models
 from kumbio_api_v2.organizations.models import Professional, RestProfessionalSchedule, Sede
+from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
 from kumbio_api_v2.users.models import User
 
 
 class RestProfessionalScheduleModelSerializer(serializers.ModelSerializer):
-    """Service model serializer."""
+    """Rest professional model serializer."""
 
     class Meta:
         """Meta class."""
 
         model = RestProfessionalSchedule
         fields = "__all__"
+
+
+class ProfessionalModelSerializer(serializers.ModelSerializer):
+    """Professional model serializer."""
+
+    user = UserModelSerializer()
+    
+    class Meta:
+        """Meta class."""
+
+        model = Professional
+        fields = ["user", "sede", "description"]
 
 
 class ProfessionalSerializer(serializers.Serializer):
@@ -32,6 +44,7 @@ class ProfessionalSerializer(serializers.Serializer):
     sede_pk = serializers.IntegerField(required=False)
     service_pk = serializers.IntegerField(required=False)
     description = serializers.CharField(required=False)
+    how_you_know_us = serializers.CharField(required=False)
 
     def create(self, validated_data):
         request = self.context.get("request")
@@ -48,12 +61,14 @@ class ProfessionalSerializer(serializers.Serializer):
             user.is_professional = user_data.get("is_professional")
             user.save()
         else:
-            user = User.objects.create_user(
-                **user_data
-            )
+            user = User.objects.create_user(**user_data)
         if sede_pk and user:
             sede = Sede.objects.get(id=sede_pk)
-            Professional.objects.create(user=user, sede=sede, is_user=True)
+            professional = Professional.objects.create(user=user, sede=sede, is_user=True)
+            organization = professional.organization
+            how_you_know_us = validated_data.get("how_you_know_us")
+            organization.how_you_know_us = how_you_know_us
+            organization.save()
         return validated_data
 
 

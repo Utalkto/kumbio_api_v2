@@ -30,6 +30,11 @@ class UserModelSerializer(serializers.ModelSerializer):
     )
     phone_number = serializers.CharField(max_length=255)
     email = serializers.EmailField(max_length=255, required=False)
+    full_name = serializers.SerializerMethodField()
+
+    def get_full_name(self, obj):
+        full_name = obj.get_full_name()
+        return full_name
 
     def validate_phone_number(self, phone_number):
         """Check if phone number is unique."""
@@ -50,6 +55,7 @@ class UserModelSerializer(serializers.ModelSerializer):
         fields = (
             "first_name",
             "last_name",
+            "full_name",
             "email",
             "phone_number",
         )
