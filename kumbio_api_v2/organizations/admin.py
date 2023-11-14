@@ -131,10 +131,3 @@ class CountryAdmin(admin.ModelAdmin):
     list_display = ["name", "slug_name", "phone_prefix"]
     search_fields = ["name", "phone_prefix"]
     list_filter = ["name", "phone_prefix"]
-
-
-# @admin.register(RestProfessionalSchedule)
-# class RestProfessionalScheduleAdmin(admin.ModelAdmin):
-#     """Service sede model admin."""
-
-#     list_display = ["professional"]

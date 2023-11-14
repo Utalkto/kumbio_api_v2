@@ -44,4 +44,4 @@ class OrganizationProfessionalModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Professional
-        fields = ("full_name", "pk")
+        fields = ["full_name", "pk"]

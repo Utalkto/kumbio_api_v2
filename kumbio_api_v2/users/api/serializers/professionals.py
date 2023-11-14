@@ -8,9 +8,10 @@ from rest_framework import serializers
 
 # Serializers
 from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
+from kumbio_api_v2.organizations.api.serializers.services import ProfessioanlServicesModelSerializer
 
 # Models
-from kumbio_api_v2.organizations.models import Professional, RestProfessionalSchedule, Sede
+from kumbio_api_v2.organizations.models import Professional, RestProfessionalSchedule, Sede, ProfessionalSchedule
 from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
 from kumbio_api_v2.users.models import User
 
@@ -18,23 +19,60 @@ from kumbio_api_v2.users.models import User
 class RestProfessionalScheduleModelSerializer(serializers.ModelSerializer):
     """Rest professional model serializer."""
 
+    date_init = serializers.DateField()
+
     class Meta:
         """Meta class."""
 
         model = RestProfessionalSchedule
-        fields = "__all__"
+        fields = ["professional", "date_init", "date_end", "description"]
+
+    def validate_date_init(self, value):
+        taken_rest = RestProfessionalSchedule.objects.filter(date_init=value).exists()
+        if taken_rest:
+            raise serializers.ValidationError("Ya existe un tiempo libre con esta fecha.")
+        return value
+
+
+class ProfessionalScheduleModelSerializer(serializers.ModelSerializer):
+    """Rest professional model serializer."""
+
+    class Meta:
+        """Meta class."""
+
+        model = ProfessionalSchedule
+        fields = ["day", "hour_init", "hour_end", "hour_init_rest", "hour_end_rest"]
 
 
 class ProfessionalModelSerializer(serializers.ModelSerializer):
     """Professional model serializer."""
 
     user = UserModelSerializer()
+    professional_schedule = serializers.SerializerMethodField()
+    professional_services = serializers.SerializerMethodField()
+
+    def get_professional_schedule(self, obj):
+        schedule = obj.professional_schedule.all()
+        professional_schedule = []
+        for item in schedule:
+            serializer = ProfessionalScheduleModelSerializer(item)
+            professional_schedule.append(serializer.data)
+        return professional_schedule
     
+    def get_professional_services(self, obj):
+        services = obj.services.all()
+        professional_services = []
+        if services:
+            for item in services:
+                serializer = ProfessioanlServicesModelSerializer(item)
+                professional_services.append(serializer.data)
+        return professional_services
+
     class Meta:
         """Meta class."""
 
         model = Professional
-        fields = ["user", "sede", "description"]
+        fields = ["user", "sede", "description", "professional_schedule", "professional_services"]
 
 
 class ProfessionalSerializer(serializers.Serializer):
@@ -80,37 +118,32 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         professional = self.context.get("professional")
-        rest_professional = self.context.get("rest")
         tutorial = self.context.get("tutorial")
         professional_schedule = validated_data.get("professional_schedule")
         sede_pk = validated_data.get("sede_pk")
         # Delete current schedule
-        if rest_professional:
-            professional.rest_professional_schedule.all().delete()
-            for schedule in professional_schedule:
-                day = schedule.get("day")
-                hour_init = schedule.get("hour_init")
-                hour_end = schedule.get("hour_end")
-                professional.rest_professional_schedule.create(
-                    day=day,
-                    hour_init=hour_init,
-                    hour_end=hour_end,
-                )
-        else:
-            professional.professional_schedule.all().delete()
-            for schedule in professional_schedule:
-                day = schedule.get("day")
-                hour_init = schedule.get("hour_init")
-                hour_end = schedule.get("hour_end")
-                professional.professional_schedule.create(
-                    day=day,
-                    hour_init=hour_init,
-                    hour_end=hour_end,
-                )
-                if tutorial:
-                    schedule.pop("professional")
-                    schedule["sede"] = sede_pk
-                    serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
-                    serializer_headquarter.is_valid(raise_exception=True)
-                    serializer_headquarter.save()
+        professional.professional_schedule.all().delete()
+        for schedule in professional_schedule:
+            day = schedule.get("day")
+            hour_init = schedule.get("hour_init")
+            hour_end = schedule.get("hour_end")
+            hour_init_rest = schedule.get("hour_init_rest")
+            hour_end_rest = schedule.get("hour_end_rest")
+            professional.professional_schedule.create(
+                day=day,
+                hour_init=hour_init,
+                hour_end=hour_end,
+                hour_init_rest=hour_init_rest,
+                hour_end_rest=hour_end_rest,
+            )
+        if tutorial:
+            schedule.pop("professional")
+            schedule["sede"] = sede_pk
+            serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
+            serializer_headquarter.is_valid(raise_exception=True)
+            serializer_headquarter.save()
+        return validated_data
+    
+    def get(self, validated_data):
+        import ipdb; ipdb.set_trace()
         return validated_data

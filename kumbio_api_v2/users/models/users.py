@@ -31,7 +31,7 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=17, blank=True, null=True)
     is_client = models.BooleanField("Cliente", default=False, help_text=("Indica si el usuario es cliente"))
     is_owner = models.BooleanField("Owner", default=False, help_text=("Indica si el usuario es propietario"))
-    # is_administrator = models.BooleanField("Owner", default=False, help_text=("Indica si el usuario es administrador"))
+    is_administrator = models.BooleanField("Admin", default=False, help_text=("Indica si el usuario es administrador"))
     is_professional = models.BooleanField(
         "Profesional", default=False, help_text=("Indica si el usuario es profesional")
     )

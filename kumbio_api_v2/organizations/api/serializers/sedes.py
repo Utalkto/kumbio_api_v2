@@ -97,5 +97,5 @@ class ServiceProfessionalSerializer(serializers.Serializer):
         service = Service.objects.create(**data_service)
         service.sedes.set([sede_pk])
         # Add professional service
-        professional.services.set([service])
+        professional.services.add(service)
         return validated_data
