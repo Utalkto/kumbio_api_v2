@@ -27,6 +27,12 @@ class Organization(KumbioModel):
 
     how_you_know_us = models.CharField("Como nos conocio", max_length=120, default=None, null=True, blank=True)
 
+    @property
+    def professionals(self):
+        from organizations.models.professionals import Professional
+
+        return Professional.objects.filter(sede__organization=self)
+
     class Meta:
         """Meta class."""
 
@@ -52,12 +58,12 @@ class OrganizationMembership(KumbioModel):
     days_duration = models.IntegerField(default=30)
 
     def save(self, *args, **kwargs):
-        if not self.start_date or not self.expiration:
-            days_durration = self.membership.trial_days
-            date_now = datetime.now().date()
-            date_expiration = date_now + timedelta(days=days_durration)
-            self.start_date = date_now
-            self.expiration = date_expiration
+        days_durration = self.membership.trial_days
+        date_now = datetime.now().date()
+        date_expiration = date_now + timedelta(days=days_durration)
+        self.start_date = date_now
+        self.expiration = date_expiration
+        self.days_duration = days_durration
         super().save(*args, **kwargs)
 
     class Meta:

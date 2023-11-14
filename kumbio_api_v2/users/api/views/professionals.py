@@ -17,7 +17,12 @@ from kumbio_api_v2.organizations.api.serializers import ServiceProfessionalSeria
 from kumbio_api_v2.organizations.models import Professional, Sede
 
 # Serializers
-from kumbio_api_v2.users.api.serializers import ProfessionalScheduleSerializer, ProfessionalSerializer
+from kumbio_api_v2.users.api.serializers import (
+    ProfessionalModelSerializer,
+    ProfessionalScheduleSerializer,
+    ProfessionalSerializer,
+    RestProfessionalScheduleModelSerializer,
+)
 
 
 class ProfesionalViewset(
@@ -36,16 +41,19 @@ class ProfesionalViewset(
 
     def dispatch(self, request, *args, **kwargs):
         """Verify that the user exists."""
-        self.professional_pk = kwargs.get("pk")
         self.tutorial = request.GET.get("tutorial")
         return super().dispatch(request, *args, **kwargs)
 
     def get_serializer_class(self):
         """Return serializer based on action."""
-        if self.action in ["schedule", "rest_professional"]:
+        if self.action in ["schedule"]:
             return ProfessionalScheduleSerializer
+        if self.action in ["rest_professional"]:
+            return RestProfessionalScheduleModelSerializer
         if self.action in ["service"]:
             return ServiceProfessionalSerializer
+        if self.action in ["retrieve"]:
+            return ProfessionalModelSerializer
         else:
             return ProfessionalSerializer
 
@@ -56,22 +64,26 @@ class ProfesionalViewset(
         return context
 
     def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
-        fist_name = request.data.get("first_name")
-        last_name = request.data.get("last_name")
-        phone_number = request.data.get("phone_number")
-        email = request.data.get("email")
-        description = request.data.get("description")
-        sede_pk = request.data.get("sede_pk")
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        user_data = data.get("user_data")
+        sede_pk = data.get("sede_pk")
+        first_name = user_data.get("first_name")
+        last_name = user_data.get("last_name")
+        email = user_data.get("email")
+        phone_number = user_data.get("phone_number")
         # Update user data
         user = instance.user
-        user.first_name = fist_name
-        user.last_name = last_name
-        user.email = email
-        user.phone_number = phone_number
+        user.first_name = first_name if first_name else user.first_name
+        user.last_name = last_name if last_name else user.last_name
+        user.email = email if email else user.email
+        user.phone_number = phone_number if phone_number else user.phone_number
         user.save()
         # Update professional data
-        instance.description = description
+        instance.description = data.get("description")
         if sede_pk:
             instance.sede = Sede.objects.get(id=sede_pk)
         instance.save()
@@ -81,9 +93,10 @@ class ProfesionalViewset(
     @action(detail=True, methods=["POST"], url_path="schedule")
     def schedule(self, request, *args, **kwargs):
         """Add professional schedule."""
+        instance = self.get_object()
         serializer = self.get_serializer(
             data=request.data,
-            context={"professional": self.professional_pk, "tutorial": self.tutorial},
+            context={"professional": instance, "tutorial": self.tutorial},
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -107,10 +120,8 @@ class ProfesionalViewset(
     def rest_professional(self, request, *args, **kwargs):
         """Add professional service."""
         instance = self.get_object()
-        serializer = self.get_serializer(
-            data=request.data,
-            context={"professional": instance, "rest": True},
-        )
+        request.data["professional"] = instance.pk
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         data = serializer.data
