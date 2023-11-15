@@ -28,15 +28,38 @@ class UserModelSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(
         min_length=2,
     )
+    phone_number = serializers.CharField(max_length=255)
+    email = serializers.EmailField(max_length=255, required=False)
+    full_name = serializers.SerializerMethodField()
+
+    def get_full_name(self, obj):
+        if isinstance(obj, User):
+            return obj.get_full_name()
+        elif isinstance(obj, dict):
+            return obj.get("first_name", "") + " " + obj.get("last_name", "")
+        else:
+            return None
+
+    def validate_phone_number(self, phone_number):
+        """Check if phone number is unique."""
+        if User.objects.filter(phone_number=phone_number).exists():
+            raise serializers.ValidationError("Ya existe un usuario registrado con ese número de teléfono.")
+        return phone_number
+
+    def validate_email(self, email):
+        """Check if phone number is unique."""
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError("Ya existe un usuario registrado con este email.")
+        return email
 
     class Meta:
         """Meta class."""
 
         model = User
         fields = (
-            "username",
             "first_name",
             "last_name",
+            "full_name",
             "email",
             "phone_number",
         )
@@ -66,7 +89,7 @@ class UserSignUpSerializer(serializers.Serializer):
         organization = Organization.objects.create(name=organization_name, sub_sector_id=sector, country=country)
         # Create membreship
         OrganizationMembership.objects.create(
-            membership=MembershipType.objects.get(membership_type="PREMIUM"),
+            membership=MembershipType.objects.get(membership_type="PRO"),
             organization=organization,
             is_active=True,
         )
