@@ -1,19 +1,19 @@
 """Organization views."""
 
 # Django REST Framework
-from rest_framework import mixins, viewsets, status
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.response import Response
 
 # Permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 
 # Serializers
 from kumbio_api_v2.organizations.api.serializers import (
     OrganizationModelSerializer,
     OrganizationProfessionalModelSerializer,
+    OrganizationSedeModelSerializer,
     SectorModelSerializer,
-    OrganizationSedeModelSerializer
 )
 from kumbio_api_v2.organizations.api.serializers.services import ServicesOrganizationModelSerializer
 
@@ -33,22 +33,22 @@ class OrganizationViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, vi
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
-        if self.action in ['services']:
+        if self.action in ["services"]:
             return ServicesOrganizationModelSerializer
-        if self.action in ['sedes']:
+        if self.action in ["sedes"]:
             return OrganizationSedeModelSerializer
         else:
             return OrganizationModelSerializer
 
-    @action(detail=True, methods=['GET'], url_path=r'services')
+    @action(detail=True, methods=["GET"], url_path=r"services")
     def services(self, request, *args, **kwargs):
         organization = self.get_object()
         services = organization.all_organization_services
         serializer = self.get_serializer(services, many=True)
         data = serializer.data
         return Response(data, status=status.HTTP_200_OK)
-    
-    @action(detail=True, methods=['GET'], url_path=r'sedes')
+
+    @action(detail=True, methods=["GET"], url_path=r"sedes")
     def sedes(self, request, *args, **kwargs):
         organization = self.get_object()
         sedes = organization.headquarter

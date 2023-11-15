@@ -30,10 +30,7 @@ router.register(
     basename="organization_professionals",
 )
 router.register(r"professionals", user_views.ProfesionalViewset, basename="professionals")
-router.register(r"appointments",
-                appointment_views.AppointmentProfesionalViewset,
-                basename="appointments"
-                )
+router.register(r"appointments", appointment_views.AppointmentProfesionalViewset, basename="appointments")
 
 
 app_name = "api"

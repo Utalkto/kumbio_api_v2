@@ -1,7 +1,6 @@
 # Django REST Framework
-from rest_framework import mixins, status, viewsets
+from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
 # Models
 from kumbio_api_v2.organizations.models import Sede

@@ -102,7 +102,7 @@ class ProfesionalViewset(
         serializer.save()
         data = serializer.data
         return Response(data, status=status.HTTP_200_OK)
-    
+
     @action(detail=True, methods=["PUT", "PATCH"], url_path="schedule-update")
     def schedule_update(self, request, *args, **kwargs):
         """Add professional schedule."""
@@ -134,7 +134,10 @@ class ProfesionalViewset(
         """Add professional service."""
         instance = self.get_object()
         request.data["professional"] = instance.pk
-        serializer = self.get_serializer(data=request.data, context={"professional": instance},)
+        serializer = self.get_serializer(
+            data=request.data,
+            context={"professional": instance},
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         data = serializer.data

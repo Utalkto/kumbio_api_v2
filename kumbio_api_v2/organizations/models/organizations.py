@@ -36,11 +36,13 @@ class Organization(KumbioModel):
     @property
     def all_organization_services(self):
         from kumbio_api_v2.organizations.models import Service
+
         return Service.objects.filter(sedes__organization=self).distinct()
 
     @property
     def headquarter(self):
         from kumbio_api_v2.organizations.models import Sede
+
         return Sede.objects.filter(organization=self).distinct()
 
     class Meta:
