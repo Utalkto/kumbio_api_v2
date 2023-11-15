@@ -20,8 +20,8 @@ router.register(r"sectors", organization_views.SectorViewSet, basename="sectors"
 router.register(r"organizations", organization_views.OrganizationViewSet, basename="organizations")
 router.register(r"organizations/(?P<organization_pk>[^/.]+)/sedes", organization_views.SedeViewset, basename="sedes")
 router.register(
-    r"organizations/(?P<organization_pk>[^/.]+)/services",
-    organization_views.ServicesOrganizationViewset,
+    r"services/",
+    organization_views.ServicesViewset,
     basename="services",
 )
 router.register(
@@ -30,7 +30,10 @@ router.register(
     basename="organization_professionals",
 )
 router.register(r"professionals", user_views.ProfesionalViewset, basename="professionals")
-router.register(r"appointments", appointment_views.AppointmentProfesionalViewset, basename="appointments")
+router.register(r"appointments",
+                appointment_views.AppointmentProfesionalViewset,
+                basename="appointments"
+                )
 
 
 app_name = "api"

@@ -33,8 +33,12 @@ class UserModelSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
 
     def get_full_name(self, obj):
-        full_name = obj.get("first_name") + " " + obj.get("last_name")
-        return full_name
+        if isinstance(obj, User):
+            return obj.get_full_name()
+        elif isinstance(obj, dict):
+            return obj.get("first_name", "") + " " + obj.get("last_name", "")
+        else:
+            return None
 
     def validate_phone_number(self, phone_number):
         """Check if phone number is unique."""

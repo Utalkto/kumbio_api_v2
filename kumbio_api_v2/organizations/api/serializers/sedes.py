@@ -9,7 +9,7 @@ from kumbio_api_v2.organizations.models import HeadquarterSchedule, Professional
 from kumbio_api_v2.users.models import User
 
 
-class OrganizationSedeSerializer(serializers.ModelSerializer):
+class OrganizationSedeModelSerializer(serializers.ModelSerializer):
     """Organization model serializer."""
 
     class Meta:

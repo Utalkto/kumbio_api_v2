@@ -46,7 +46,7 @@ class ProfesionalViewset(
 
     def get_serializer_class(self):
         """Return serializer based on action."""
-        if self.action in ["schedule"]:
+        if self.action in ["schedule", "schedule_update"]:
             return ProfessionalScheduleSerializer
         if self.action in ["rest_professional"]:
             return RestProfessionalScheduleModelSerializer
@@ -102,6 +102,19 @@ class ProfesionalViewset(
         serializer.save()
         data = serializer.data
         return Response(data, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=["PUT", "PATCH"], url_path="schedule-update")
+    def schedule_update(self, request, *args, **kwargs):
+        """Add professional schedule."""
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            data=request.data,
+            context={"professional": instance, "tutorial": self.tutorial},
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        data = serializer.data
+        return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["POST"], url_path="service")
     def service(self, request, *args, **kwargs):
@@ -121,7 +134,7 @@ class ProfesionalViewset(
         """Add professional service."""
         instance = self.get_object()
         request.data["professional"] = instance.pk
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data, context={"professional": instance},)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         data = serializer.data

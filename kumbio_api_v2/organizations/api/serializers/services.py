@@ -15,11 +15,11 @@ class ProfessioanlServicesModelSerializer(serializers.ModelSerializer):
         fields = ["name", "price", "duration"]
 
 
-class ServicesOrganizationModelSerializer(serializers.Serializer):
+class ServicesOrganizationModelSerializer(serializers.ModelSerializer):
     """Service model serializer."""
 
     class Meta:
         """Meta class."""
 
         model = Service
-        fields = ["name"]
+        fields = ["id", "name", "description", "price", "duration"]
