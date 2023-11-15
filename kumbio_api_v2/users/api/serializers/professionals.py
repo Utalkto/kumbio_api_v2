@@ -28,7 +28,8 @@ class RestProfessionalScheduleModelSerializer(serializers.ModelSerializer):
         fields = ["professional", "date_init", "date_end", "description"]
 
     def validate_date_init(self, value):
-        taken_rest = RestProfessionalSchedule.objects.filter(date_init=value).exists()
+        professional = self.context.get("professional")
+        taken_rest = RestProfessionalSchedule.objects.filter(professional=professional, date_init=value).exists()
         if taken_rest:
             raise serializers.ValidationError("Ya existe un tiempo libre con esta fecha.")
         return value
