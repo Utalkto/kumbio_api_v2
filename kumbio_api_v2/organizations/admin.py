@@ -91,7 +91,7 @@ class MembershipTypeAdmin(admin.ModelAdmin):
 class SedeAdmin(admin.ModelAdmin):
     """Sede model admin."""
 
-    list_display = ["name"]
+    list_display = ["name", "organization"]
     search_fields = ["name"]
     list_filter = ["name"]
     inlines = [HeadquarterScheduleInline, SedeProfesionalInline, SedeServicesInline]

@@ -52,7 +52,7 @@ class Organization(KumbioModel):
         verbose_name_plural = "Organizations"
 
     def __str__(self):
-        return f"Organization {self.name} - {self.sub_sector}"
+        return f"Organization {self.name} - Sector {self.sub_sector}"
 
 
 class OrganizationMembership(KumbioModel):

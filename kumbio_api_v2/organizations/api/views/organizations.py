@@ -21,7 +21,14 @@ from kumbio_api_v2.organizations.api.serializers.services import ServicesOrganiz
 from kumbio_api_v2.organizations.models import Organization, Professional, Sector
 
 
-class OrganizationViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+class OrganizationViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
     """Organization view set.
 
     Handle sign up, login and account verification.
@@ -29,7 +36,6 @@ class OrganizationViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, vi
 
     queryset = Organization.objects.all().prefetch_related("organization_sedes")
     lookup_field = "pk"
-    serializer_class = OrganizationModelSerializer
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
@@ -37,6 +43,8 @@ class OrganizationViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, vi
             return ServicesOrganizationModelSerializer
         if self.action in ["sedes"]:
             return OrganizationSedeModelSerializer
+        # if self.action in ["update", "partial_update"] :
+        #     return OrganizationModelSerializer(partial=True)
         else:
             return OrganizationModelSerializer
 

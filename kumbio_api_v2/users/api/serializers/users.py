@@ -10,8 +10,6 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from rest_framework.validators import UniqueValidator
 
-from kumbio_api_v2.organizations.models import Country, MembershipType, Organization, OrganizationMembership, Sede
-
 # Models
 from kumbio_api_v2.users.models import User
 
@@ -71,35 +69,30 @@ class UserSignUpSerializer(serializers.Serializer):
     Handle sign up data validation.
     """
 
-    organization_name = serializers.CharField(max_length=255)
-    sector = serializers.IntegerField()
+    first_name = serializers.CharField(min_length=2, max_length=255)
+    last_name = serializers.CharField(min_length=2, max_length=255)
+    phone_number = serializers.CharField(max_length=255)
     email = serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all())])
     password = serializers.CharField(min_length=8, max_length=64)
-    country = serializers.CharField(max_length=255)
+
+    def validate_phone_number(self, phone_number):
+        """Check if phone number is unique."""
+        if User.objects.filter(phone_number=phone_number).exists():
+            raise serializers.ValidationError("Ya existe un usuario registrado con ese número de teléfono.")
+        return phone_number
+
+    def validate_email(self, email):
+        """Check if phone number is unique."""
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError("Ya existe un usuario registrado con este email.")
+        return email
 
     def create(self, data):
         """Handle user and profile creation."""
-        organization_name = data.get("organization_name")
-        sector = data.get("sector")
-        email = data.get("email")
-        password = data.get("password")
-        country = data.get("country")
-        country = Country.objects.filter(slug_name=country).first()
-        # Create organization
-        organization = Organization.objects.create(name=organization_name, sub_sector_id=sector, country=country)
-        # Create membreship
-        OrganizationMembership.objects.create(
-            membership=MembershipType.objects.get(membership_type="PRO"),
-            organization=organization,
-            is_active=True,
-        )
-        # Create sede
-        sede = Sede.objects.create(
-            name=organization_name,
-            organization=organization,
-        )
         # Create user
-        user = User.objects.create_user(email=email, password=password, is_owner=True)
+        full_name = data.get("first_name") + " " + data.get("last_name")
+        username = full_name.lower().replace(" ", "-")
+        user = User.objects.create_user(username=username, is_owner=True, is_professional=True, **data)
         token = generate_auth_token(user)
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
         email = payload.get("user")
@@ -107,8 +100,7 @@ class UserSignUpSerializer(serializers.Serializer):
             token = email
             return token.key, token.user
         token = user.get_autorized_token
-        sede_pk = sede.pk
-        return user, token, sede_pk
+        return user, token
 
 
 class UserLoginSerializer(serializers.Serializer):
