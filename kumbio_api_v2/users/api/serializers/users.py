@@ -91,7 +91,7 @@ class UserSignUpSerializer(serializers.Serializer):
         # Create user
         full_name = data.get("first_name") + " " + data.get("last_name")
         username = full_name.lower().replace(' ', '-')
-        user = User.objects.create_user(username=username, is_owner=True, **data)
+        user = User.objects.create_user(username=username, is_owner=True, is_professional=True, **data)
         token = generate_auth_token(user)
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
         email = payload.get("user")

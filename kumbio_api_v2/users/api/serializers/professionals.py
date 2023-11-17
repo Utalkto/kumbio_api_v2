@@ -118,10 +118,19 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
     sede_pk = serializers.IntegerField(required=False)
 
     def create(self, validated_data):
-        professional = self.context.get("professional")
         tutorial = self.context.get("tutorial")
         professional_schedule = validated_data.get("professional_schedule")
         sede_pk = validated_data.get("sede_pk")
+        if tutorial:
+            request = self.context.get("request")
+            user = request.user
+            sede = Sede.objects.filter(id=sede_pk).first()
+            professional = Professional.objects.create(
+                user=user,
+                sede=sede,
+            )
+        else:
+            professional = self.context.get("professional")
         # Delete current schedule
         professional.professional_schedule.all().delete()
         for schedule in professional_schedule:

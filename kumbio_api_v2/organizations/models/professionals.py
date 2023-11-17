@@ -10,7 +10,6 @@ class Professional(KumbioModel):
     description = models.TextField(max_length=255, blank=True, null=True)
     sede = models.ForeignKey("organizations.Sede", on_delete=models.CASCADE, related_name="organization_professionals")
     services = models.ManyToManyField("organizations.Service", related_name="service_professionals")
-    is_user = models.BooleanField(default=False)
 
     @property
     def organization(self):
