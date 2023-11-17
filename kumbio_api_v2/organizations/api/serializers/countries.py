@@ -8,7 +8,6 @@ from kumbio_api_v2.organizations.models import Country
 
 
 class CountryModelSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Country
         fields = [

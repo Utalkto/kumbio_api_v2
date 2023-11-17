@@ -68,6 +68,7 @@ class UserSignUpSerializer(serializers.Serializer):
 
     Handle sign up data validation.
     """
+
     first_name = serializers.CharField(min_length=2, max_length=255)
     last_name = serializers.CharField(min_length=2, max_length=255)
     phone_number = serializers.CharField(max_length=255)
@@ -90,7 +91,7 @@ class UserSignUpSerializer(serializers.Serializer):
         """Handle user and profile creation."""
         # Create user
         full_name = data.get("first_name") + " " + data.get("last_name")
-        username = full_name.lower().replace(' ', '-')
+        username = full_name.lower().replace(" ", "-")
         user = User.objects.create_user(username=username, is_owner=True, is_professional=True, **data)
         token = generate_auth_token(user)
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])

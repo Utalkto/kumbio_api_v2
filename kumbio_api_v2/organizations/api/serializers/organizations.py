@@ -6,13 +6,13 @@ from rest_framework import serializers
 
 # Models
 from kumbio_api_v2.organizations.models import (
+    MembershipType,
     Organization,
+    OrganizationMembership,
     Professional,
     Sector,
-    SubSector,
-    OrganizationMembership,
-    MembershipType,
     Sede,
+    SubSector,
 )
 
 
