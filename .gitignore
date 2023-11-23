@@ -282,3 +282,4 @@ kumbio_api_v2/media/
 pruebas.txt
 .envs/.local/.mailjet
 .envs/.local/.ultramsg
+.vscode/settings.json
