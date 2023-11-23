@@ -29,3 +29,7 @@ class Notification(KumbioModel):
         null=True,
         blank=True,
     )
+    class Meta:
+        ordering = ("-created",)
+        verbose_name = "Notification"
+        verbose_name_plural = "Notifications"
