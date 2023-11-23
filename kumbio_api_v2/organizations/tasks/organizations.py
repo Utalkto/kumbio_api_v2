@@ -7,7 +7,7 @@ from re import U
 from celery.schedules import crontab
 
 # templates
-from communications.models.template import MailTemplate
+from kumbio_api_v2.communications.models.templates import MailTemplate
 
 # communications
 from kumbio_api_v2.communications.notification import replace_message_tags, send_email, send_whatsapp
