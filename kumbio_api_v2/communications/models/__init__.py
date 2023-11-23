@@ -1,2 +1,2 @@
-from .notification import * #noqa
-from .template import * #noqa
+from .notifications import * #noqa
+from .templates import * #noqa
