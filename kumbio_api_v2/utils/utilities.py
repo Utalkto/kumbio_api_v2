@@ -7,19 +7,19 @@ from django.conf import settings
 from django.utils import timezone
 
 
-def generate_auth_token(user, **kwargs):
+def generate_auth_token(user, type, **kwargs):
     """Create JWT token that the user can use to login for specific context [origin]."""
     expiration_date = timezone.localtime() + timedelta(days=2)
     payload = {
         "user": user.email,
         "exp": int(expiration_date.timestamp()),
-        "type": "login",
+        "type": type,
     }
     token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
     return token
 
 
-def decode_auth_token(token, origin, skip_validation=False):
+def decode_auth_token(token):
     """Decode JWT auth token based on origin."""
     error = []
     payload = ""
@@ -34,8 +34,4 @@ def decode_auth_token(token, origin, skip_validation=False):
         error.append("Invalid token")
     if not payload:
         error.append("Not payload")
-    else:
-        if not skip_validation:
-            if payload["type"] != origin:
-                error.append("Invalid origin jwt")
     return payload, error

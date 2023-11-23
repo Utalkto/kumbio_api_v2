@@ -50,6 +50,6 @@ class User(AbstractUser):
         return reverse("users:detail", kwargs={"pk": self.id})
 
     @property
-    def get_autorized_token(self):
+    def get_authorized_token(self):
         token, _is_new = Token.objects.update_or_create(user=self)
         return token.key
