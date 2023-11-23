@@ -1,1 +1,1 @@
-from appointments import * #noqa
+from appointments import *  # noqa

@@ -65,8 +65,7 @@ def send_whatsapp(send_to: str, message: str):
 
 
 def replace_message_tags(message: str, data_to_replace: dict) -> str:
-
     for key, value in data_to_replace.items():
-        message = message.replace(f'{{{key}}}', str(value))
+        message = message.replace(f"{{{key}}}", str(value))
 
     return message
