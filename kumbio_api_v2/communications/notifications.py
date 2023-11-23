@@ -62,3 +62,10 @@ def send_whatsapp(send_to: str, message: str):
     if response.status_code == 200:
         return True
     return False
+
+
+def replace_message_tags(message: str, data_to_replace: dict) -> str:
+    for key, value in data_to_replace.items():
+        message = message.replace(f"{{{key}}}", str(value))
+
+    return message
