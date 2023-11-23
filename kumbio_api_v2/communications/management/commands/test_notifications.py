@@ -1,7 +1,7 @@
 from cgi import test
 from unittest.mock import patch
 
-from communications.notifications import send_email, send_whatsapp
+from kumbio_api_v2.communications.notification import send_email, send_whatsapp
 
 # Django
 from django.core.management.base import BaseCommand

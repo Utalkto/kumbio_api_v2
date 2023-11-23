@@ -8,7 +8,7 @@ from appointments.models import Appointment
 from communications.models.template import MailTemplate
 
 # communications
-from communications.notifications import replace_message_tags, send_email, send_whatsapp
+from kumbio_api_v2.communications.notification import replace_message_tags, send_email, send_whatsapp
 
 from config import celery_app
 

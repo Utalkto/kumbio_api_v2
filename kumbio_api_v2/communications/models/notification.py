@@ -4,6 +4,7 @@ from django.db import models
 
 from kumbio_api_v2.organizations.models import Organization
 
+from kumbio_api_v2.utils.models import KumbioModel
 
 class MessageType(Enum):
     NOTIFICATION = 1
@@ -11,7 +12,7 @@ class MessageType(Enum):
     ADMINS = 3
 
 
-class Notification(models.Model):
+class Notification(KumbioModel):
     Organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="organization_notifications")
     type = models.IntegerField(choices=[(tag, tag.value) for tag in MessageType])
     template = models.ForeignKey("Template", on_delete=models.CASCADE, related_name="template_notifications")
