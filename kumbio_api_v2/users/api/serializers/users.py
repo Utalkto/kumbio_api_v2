@@ -11,7 +11,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.validators import UniqueValidator
 
 # Models
-from kumbio_api_v2.users.models import User
+from kumbio_api_v2.users.models import User, Profile
 
 # Utilities
 from kumbio_api_v2.utils.utilities import generate_auth_token, decode_auth_token

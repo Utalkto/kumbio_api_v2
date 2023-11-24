@@ -32,7 +32,6 @@ class UserViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.Lis
         action_mappings = {
             "login": UserLoginSerializer,
             "signup": UserSignUpSerializer,
-            "partial": UserModelSerializer,
         }
         return action_mappings.get(self.action, UserModelSerializer)
 
