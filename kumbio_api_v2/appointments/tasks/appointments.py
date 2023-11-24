@@ -1,16 +1,12 @@
-import email
-from email import message
-from tarfile import data_filter
-
 from appointments.models import Appointment
+
+from config import celery_app
 
 # templates
 from kumbio_api_v2.communications.models.templates import MailTemplate
 
 # communications
 from kumbio_api_v2.communications.notification import replace_message_tags, send_email, send_whatsapp
-
-from config import celery_app
 
 
 @celery_app.task()

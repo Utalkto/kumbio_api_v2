@@ -1,19 +1,13 @@
-import email
-from curses.ascii import US
-from re import template
-
-# templates
-from kumbio_api_v2.communications.models.templates import MailTemplate
-
-# communications
-from kumbio_api_v2.communications.notification import replace_message_tags, send_email, send_whatsapp
-from django.contrib.auth import get_user_model
-from users.models import User
+# Models
+from kumbio_api_v2.users.models import User
 
 from config import celery_app
-from kumbio_api_v2.conftest import user
 
-User = get_user_model()
+# Templates
+from kumbio_api_v2.communications.models.templates import MailTemplate
+
+# Communications
+from kumbio_api_v2.communications.notification import replace_message_tags, send_email, send_whatsapp
 
 
 @celery_app.task()

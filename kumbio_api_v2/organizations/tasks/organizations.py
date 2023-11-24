@@ -1,19 +1,13 @@
-# Celery
-import email
-from curses.ascii import US
-from email import message
-from re import U
-
 from celery.schedules import crontab
+from users.models import User
+
+from config import celery_app
 
 # templates
 from kumbio_api_v2.communications.models.templates import MailTemplate
 
 # communications
-from kumbio_api_v2.communications.notification import replace_message_tags, send_email, send_whatsapp
-from users.models import User
-
-from config import celery_app
+from kumbio_api_v2.communications.notification import replace_message_tags, send_email
 
 # Models
 from kumbio_api_v2.organizations.models import OrganizationMembership
@@ -81,7 +75,8 @@ def wellcome_to_premium_plan(owner: User):
 def attempt_to_activate_whatsapp(owner: User):
     # if owner is not premium
     email = owner.email
-    template = MailTemplate.objects.get(pk=0)  #  TODO: change to email template
+    # Change to email template
+    template = MailTemplate.objects.get(pk=0)
     data = {  # TODO: change to owner data
         "organization_owner_name": owner.name,
     }
