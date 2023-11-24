@@ -2,10 +2,8 @@ import json
 import os
 
 import requests
-from dotenv import load_dotenv
 from mailjet_rest import Client
 
-load_dotenv()
 
 MAILJET_API_KEY = os.environ.get("MAILJET_API_KEY")
 MAILJET_SECRET_KEY = os.environ.get("MAILJET_SECRET_KEY")
