@@ -25,20 +25,24 @@ class ClientModelSerializer(serializers.ModelSerializer):
 
     user_data = UserModelSerializer()
     profile_data = ProfileModelSerializer(read_only=True)
+    organization_pk = serializers.IntegerField()
 
     class Meta:
         """Meta class."""
 
         model = User
-        fields = "__all__"
+        fields = [
+            "user_data",
+            "profile_data",
+            "organization_pk"
+        ]
 
-    def create(self, validated_data):
+    def create(self, data):
         """Create and return a new `Profile` instance, given the validated data."""
-        import ipdb; ipdb.set_trace()
-        user_data = validated_data.pop("user_data")
+        user_data = data.get("user_data")
+        organization_pk = data.get("organization_pk")
         user = User.objects.create_user(**user_data, is_client=True)
         if user:
             # Create profile
-            profile = Profile.objects.create(user=user)
-            return profile
-        return validated_data
+            Profile.objects.create(user=user, organization_id=organization_pk, is_main=True)
+        return data
