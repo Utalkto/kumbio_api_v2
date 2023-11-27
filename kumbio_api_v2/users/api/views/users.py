@@ -15,7 +15,7 @@ from kumbio_api_v2.users.api.serializers import UserLoginSerializer, UserModelSe
 from kumbio_api_v2.users.models import User
 
 # Automations
-from kumbio_api_v2.users.tasks.users import owner_wellcome, owner_wellcome_whatsapp
+from kumbio_api_v2.users.tasks import owner_wellcome, owner_wellcome_whatsapp
 
 
 class UserViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
