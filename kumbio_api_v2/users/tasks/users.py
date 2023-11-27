@@ -1,6 +1,4 @@
 # Models
-from kumbio_api_v2.users.models import User
-
 from config import celery_app
 
 # Templates
@@ -8,6 +6,7 @@ from kumbio_api_v2.communications.models.templates import MailTemplate
 
 # Communications
 from kumbio_api_v2.communications.notification import replace_message_tags, send_email, send_whatsapp
+from kumbio_api_v2.users.models import User
 
 
 @celery_app.task()
