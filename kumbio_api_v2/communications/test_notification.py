@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from communications.notifications import send_email, send_whatsapp
+from kumbio_api_v2.communications.notification import send_email, send_whatsapp
 
 
 @patch("communications.notifications.requests.request")
