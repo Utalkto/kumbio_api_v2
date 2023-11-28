@@ -11,6 +11,7 @@ class NotificationAdmin(admin.ModelAdmin):
 
     list_display = (
         "id",
+        "organization",
         "created",
         "modified",
     )
@@ -37,6 +38,7 @@ class MailTemplateAdmin(admin.ModelAdmin):
 
     list_display = (
         "id",
+        "name",
         "created",
         "modified",
     )
