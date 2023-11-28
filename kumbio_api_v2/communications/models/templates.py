@@ -1,5 +1,3 @@
-from enum import Enum
-
 from django.db import models
 
 from kumbio_api_v2.utils.models import KumbioModel
