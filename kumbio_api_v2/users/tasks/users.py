@@ -1,13 +1,16 @@
+from datetime import timezone
+
 from celery.schedules import crontab
 
 from config import celery_app
+from kumbio_api_v2.appointments.models import Appointment
 
 # Templates
 from kumbio_api_v2.communications.models.templates import MailTemplate
 
 # Communications
 from kumbio_api_v2.communications.notification import replace_message_tags, send_email, send_whatsapp
-from kumbio_api_v2.organizations.models import Organization
+from kumbio_api_v2.organizations.models import Organization, Service
 from kumbio_api_v2.users.models import User
 
 
@@ -32,8 +35,29 @@ def check_user_status():
                 owner_wellcome_whatsapp_not_complete_onboarding(usuario)
         register_date = usuario.date_joined
         days_since_register = (timezone.now() - register_date).days
-        #cantidad de appointments de la organizacion del usuario
-        #if days_since_register >=2
+        organization = Organization.objects.get(owner=usuario)
+        appointments = Appointment.objects.filter(organization=organization).count()
+        services = Service.objects.filter(organization=organization).count()
+        if days_since_register >= 2 and appointments == 0:
+            schedule_first_appointment(usuario)
+
+        if days_since_register >= 4 and services < 3:
+            add_all_your_services(usuario)
+
+        if days_since_register >= 6 and appointments < 10:
+            # TODO: check if appointments are from calendar or webpage
+            schedule_this_week_appointments(usuario)
+        if days_since_register >= 8 and appointments < 10:
+            # TODO: check if appointments are from calendar or webpage
+            webpage_online_schedule(usuario)
+        if days_since_register >= 10 and appointments < 10:
+            # TODO: check if appointments are from calendar or webpage
+            share_your_link(usuario)
+        if days_since_register >= 14:
+            premium_subscription_expiring(usuario)
+        if days_since_register >= 17:
+            how_you_doing(usuario)
+
 
 @celery_app.task()
 def get_users_count():

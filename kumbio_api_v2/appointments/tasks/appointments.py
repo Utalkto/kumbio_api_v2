@@ -8,6 +8,9 @@ from kumbio_api_v2.communications.models.templates import MailTemplate
 # communications
 from kumbio_api_v2.communications.notification import replace_message_tags, send_email, send_whatsapp
 
+# TODO: agregar tareas para enviar correos y whatsapp
+# TODO: se necesitan los criterios para enviar correos y whatsapp
+
 
 @celery_app.task()
 def appointment_confirm(appointment: Appointment):
@@ -160,3 +163,5 @@ def appointment_reminder(appointment: Appointment):
         # "organization_phone": appointment.sede.organization.phone_number,
         "organization_email": appointment.sede.organization.email,
     }
+    message = replace_message_tags(template.message, data)
+    send_whatsapp(phone, message)
