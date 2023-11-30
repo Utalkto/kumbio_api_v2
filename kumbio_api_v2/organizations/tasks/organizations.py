@@ -20,6 +20,11 @@ def setup_periodic_tasks(sender, **kwargs):
         check_organization_memberships,
         name="check_organization_memberships",
     )
+    sender.add_periodic_task(
+        crontab(day_of_month="1", hour=00, minute=00),
+        monthly_summary,
+        name="monthly_summary",
+    )
 
 
 @celery_app.task
@@ -30,9 +35,8 @@ def check_organization_memberships():
         if membership.days_duration == 0:
             membership.is_active = False
             membership.save()
-            # TODO: get owner
-            # owner = "example"
-            # premium_subscription_over(membership.organization.owner)
+            owner = membership.organization.owner
+            premium_subscription_over(owner)
         if membership.days_duration > 0:
             membership.days_duration -= 1
             membership.save()
@@ -41,7 +45,7 @@ def check_organization_memberships():
 @celery_app.task()
 def premium_subscription_over(owner):
     email = owner.email
-    template = MailTemplate.objects.get(pk=0)  # TODO: change to email template
+    template = MailTemplate.objects.get(pk=13)  # TODO: change to email template
     data = {  # TODO: change to owner data
         "organization_owner_name": owner.name,
     }
@@ -51,9 +55,10 @@ def premium_subscription_over(owner):
 
 @celery_app.task()
 def wellcome_to_pro_plan(owner: User):
+    # TODO: use this task when user buy a pro plan
     email = owner.email
     template = MailTemplate.objects.get(pk=0)  # TODO: change to email template
-    data = {  # TODO: change to owner data
+    data = {
         "organization_owner_name": owner.name,
     }
     message = replace_message_tags(template.message, data)
@@ -62,6 +67,7 @@ def wellcome_to_pro_plan(owner: User):
 
 @celery_app.task()
 def wellcome_to_premium_plan(owner: User):
+    # TODO: use this task when user buy a premium plan
     email = owner.email
     template = MailTemplate.objects.get(pk=0)  # TODO: change to email template
     data = {  # TODO: change to owner data
@@ -73,6 +79,7 @@ def wellcome_to_premium_plan(owner: User):
 
 @celery_app.task()
 def attempt_to_activate_whatsapp(owner: User):
+    # TODO: use this task when user try to activate whatsapp
     # if owner is not premium
     email = owner.email
     # Change to email template
