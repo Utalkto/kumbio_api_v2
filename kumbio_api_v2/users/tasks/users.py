@@ -1,4 +1,5 @@
-# Models
+from celery.schedules import crontab
+
 from config import celery_app
 
 # Templates
@@ -6,8 +7,33 @@ from kumbio_api_v2.communications.models.templates import MailTemplate
 
 # Communications
 from kumbio_api_v2.communications.notification import replace_message_tags, send_email, send_whatsapp
+from kumbio_api_v2.organizations.models import Organization
 from kumbio_api_v2.users.models import User
 
+
+@celery_app.on_after_finalize.connect
+def setup_periodic_tasks(sender, **kwargs):
+    sender.add_periodic_task(
+        crontab(hour=8, minute=00),
+        check_user_status,
+        name="check_user_status",
+    )
+
+
+@celery_app.task()
+def check_user_status():
+    usuarios = User.objects.all()
+    for usuario in usuarios:
+        if usuario.is_owner:
+            # TODO refactor this
+            if usuario.onboarding_complete and usuario.headquarters.count() == 1 and usuario.services.count() >= 1:
+                owner_wellcome_whatsapp(usuario)
+            else:
+                owner_wellcome_whatsapp_not_complete_onboarding(usuario)
+        register_date = usuario.date_joined
+        days_since_register = (timezone.now() - register_date).days
+        #cantidad de appointments de la organizacion del usuario
+        #if days_since_register >=2
 
 @celery_app.task()
 def get_users_count():
@@ -18,9 +44,16 @@ def get_users_count():
 @celery_app.task()
 def owner_wellcome(owner: User):
     email = owner.email
-    template = MailTemplate.objects.get(pk=0)  # TODO: change to email template
+    organization = Organization.objects.get(owner=owner)
+    template = MailTemplate.objects.get(pk=1)  # TODO: change to email template
     data = {  # TODO: change to owner data
         "organization_owner_name": owner.name,
+        "service_name": "example",
+        "professional_name": "example",
+        "place_name": "example",
+        "place_address": "example",
+        "organization_name": organization.name,
+        "organization_phone": "example",  # organization.phone_number,
     }
     replace_message_tags(template.message, data)
     send_email(email, template.subject, template.message)
@@ -32,11 +65,16 @@ def owner_wellcome_whatsapp(owner: User):
     # only if 1 headquarter is added
     # only if at least 1 service is added
     phone = owner.phone_number
-    template = MailTemplate.objects.get(pk=0)  # TODO: change to whatsapp template
+    organization = Organization.objects.get(owner=owner)
+    template = MailTemplate.objects.get(pk=2)  # TODO: change to whatsapp template
     data = {
         "organization_owner_name": owner.name,
-        "organization_name": owner.organization.name,
-        "organization_phone": owner.organization.phone_number,
+        "service_name": "example",
+        "professional_name": "example",
+        "place_name": "example",
+        "place_address": "example",
+        "organization_name": organization.name,
+        "organization_phone": "example",  # organization.phone_number,
     }
     replace_message_tags(template.message, data)
     send_whatsapp(phone, template.message)
@@ -48,11 +86,16 @@ def owner_wellcome_whatsapp_not_complete_onboarding(owner: User):
     # only if 1 headquarter is not added
     # only if at least 1 service is not added
     phone = owner.phone_number
-    template = MailTemplate.objects.get(pk=0)  # TODO: change to whatsapp template
+    organization = Organization.objects.get(owner=owner)
+    template = MailTemplate.objects.get(pk=3)  # TODO: change to whatsapp template
     data = {
         "organization_owner_name": owner.name,
-        "organization_name": owner.organization.name,
-        "organization_phone": owner.organization.phone_number,
+        "service_name": "example",
+        "professional_name": "example",
+        "place_name": "example",
+        "place_address": "example",
+        "organization_name": organization.name,
+        "organization_phone": "example",  # organization.phone_number,
     }
     replace_message_tags(template.message, data)
     send_whatsapp(phone, template.message)
@@ -63,7 +106,7 @@ def schedule_first_appointment(owner: User):
     # 2 days after register
     # only if no appointment has been scheduled
     email = owner.email
-    template = MailTemplate.objects.get(pk=0)  # TODO: change to email template
+    template = MailTemplate.objects.get(pk=4)  # TODO: change to email template
     data = {
         "organization_owner_name": owner.name,
     }
@@ -76,7 +119,7 @@ def add_all_your_services(owner: User):
     # 4 days after register
     # only if less than 3 services has been added
     email = owner.email
-    template = MailTemplate.objects.get(pk=0)  # TODO: change to email template
+    template = MailTemplate.objects.get(pk=5)  # TODO: change to email template
     data = {
         "organization_owner_name": owner.name,
     }
@@ -89,7 +132,7 @@ def schedule_this_week_appointments(owner: User):
     # 6 days after register
     # only if less than 10 appointments has been scheduled from calendar
     email = owner.email
-    template = MailTemplate.objects.get(pk=0)  # TODO: change to email template
+    template = MailTemplate.objects.get(pk=6)  # TODO: change to email template
     data = {
         "organization_owner_name": owner.name,
     }
@@ -102,7 +145,7 @@ def webpage_online_schedule(owner: User):
     # 8 days after register
     # only if less than 10 appointments has been scheduled from webpage
     email = owner.email
-    template = MailTemplate.objects.get(pk=0)  # TODO: change to email template
+    template = MailTemplate.objects.get(pk=7)  # TODO: change to email template
     data = {
         "organization_owner_name": owner.name,
     }
@@ -115,10 +158,11 @@ def share_your_link(owner: User):
     # 10 days after register
     # only if less than 10 appointments has been scheduled from webpage
     email = owner.email
-    template = MailTemplate.objects.get(pk=0)  # TODO: change to email template
+    organization = Organization.objects.get(owner=owner)
+    template = MailTemplate.objects.get(pk=8)  # TODO: change to email template
     data = {
         "organization_owner_name": owner.name,
-        "organization_name": owner.organization.name,
+        "organization_name": organization.name,
     }
     replace_message_tags(template.message, data)
     send_email(email, template.subject, template.message)
@@ -128,7 +172,7 @@ def share_your_link(owner: User):
 def premium_subscription_expiring(owner: User):
     # 14 days after register
     email = owner.email
-    template = MailTemplate.objects.get(pk=0)  # TODO: change to email template
+    template = MailTemplate.objects.get(pk=11)  # TODO: change to email template
     data = {  # TODO: change to owner data
         "organization_owner_name": owner.name,
     }
@@ -140,20 +184,22 @@ def premium_subscription_expiring(owner: User):
 def how_you_doing(owner: User):
     # 17 days after register
     phone = owner.phone_number
-    template = MailTemplate.objects.get(pk=0)  # TODO: change to whatsapp template
+    template = MailTemplate.objects.get(pk=12)  # TODO: change to whatsapp template
     data = {  # TODO: change to owner data
-        "organization_owner_name": owner.name,
+        "client_name": owner.name,
     }
     replace_message_tags(template.message, data)
     send_whatsapp(phone, template.message)
 
 
 @celery_app.task
-def professional_wellcome(professional: User):
+def professional_wellcome(professional: User, owner: User):
     email = professional.email
-    template = MailTemplate.objects.get(pk=0)  # TODO: change to email template
+    template = MailTemplate.objects.get(pk=19)  # TODO: change to email template
     data = {  # TODO: change to professional data
         "professional_name": professional.name,
+        "organization_owner_name": owner.name,
+        "organization_name": Organization.objects.get(owner=owner).name,
     }
     message = replace_message_tags(template.message, data)
     send_email(email, template.subject, message)
