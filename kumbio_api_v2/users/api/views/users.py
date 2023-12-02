@@ -14,6 +14,9 @@ from kumbio_api_v2.users.api.serializers import UserLoginSerializer, UserModelSe
 # Models
 from kumbio_api_v2.users.models import User
 
+# Tasks
+from kumbio_api_v2.communications.tasks import send_message_whatsapp
+
 # Automations
 from kumbio_api_v2.users.tasks import owner_wellcome, owner_wellcome_whatsapp
 
@@ -70,6 +73,8 @@ class UserViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.Lis
         serializer.is_valid(raise_exception=True)
         user, token = serializer.save()
         data = {"user": UserModelSerializer(user).data, "access_token": token}
-        owner_wellcome(user)
-        owner_wellcome_whatsapp(user)
+
+        is_sent = send_message_whatsapp(user)
+        # owner_wellcome(user)
+        # owner_wellcome_whatsapp(user)
         return Response(data, status=status.HTTP_201_CREATED)

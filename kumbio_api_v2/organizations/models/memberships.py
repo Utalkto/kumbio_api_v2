@@ -8,6 +8,7 @@ class MembershipType(models.Model):
     class MembershipTypeOptions(models.TextChoices):
         """User staff permissions dashboard."""
 
+        FREE_TRIAL = "FREE_TRIAL", "Free trial"
         FREE = "FREE", "Gratis"
         PRO = "PRO", "Pro"
         PREMIUM = "PREMIUM", "Premium"
@@ -24,13 +25,29 @@ class MembershipType(models.Model):
 
     professionals_allowed = models.PositiveIntegerField("Profesionales permitidos", null=True, blank=True)
 
-    email_notifications_allowed = models.PositiveIntegerField("Notificaciones permitidas", null=True, blank=True)
+    email_notifications_allowed = models.PositiveIntegerField("Notificaciones email permitidas", null=True, blank=True)
 
-    email_reminders_allowed = models.PositiveIntegerField("Recordatorios permitidos", null=True, blank=True)
+    email_reminders_allowed = models.PositiveIntegerField("Recordatorios email permitidos", null=True, blank=True)
+
+    wpp_notifications_allowed = models.PositiveIntegerField("Notificaciones por wpp permitidas", null=True, blank=True)
+
+    wpp_reminders_allowed = models.PositiveIntegerField("Recordatorios wpp permitidos", null=True, blank=True)
 
     price = models.FloatField("Pricio membresía", null=True, blank=True)
 
     trial_days = models.PositiveIntegerField(default=14)
+
+    email = models.BooleanField(
+        "Permite notificaciones por email",
+        default=False,
+        help_text="Cuando esta en True significa que puede enviar notificaciones vía email."
+    )
+
+    whatsapp = models.BooleanField(
+        "Permite notificaciones por wpp",
+        default=False,
+        help_text="Cuando esta en True significa que puede enviar notificaciones vía wpp."
+    )
 
     class Meta:
         verbose_name = "Membresía"
