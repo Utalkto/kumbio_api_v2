@@ -13,6 +13,7 @@ from kumbio_api_v2.users.api.serializers import UserLoginSerializer, UserModelSe
 
 # Models
 from kumbio_api_v2.users.models import User
+from kumbio_api_v2.communications.models import MailTemplate
 
 # Tasks
 from kumbio_api_v2.communications.tasks import send_message_whatsapp
@@ -73,8 +74,10 @@ class UserViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.Lis
         serializer.is_valid(raise_exception=True)
         user, token = serializer.save()
         data = {"user": UserModelSerializer(user).data, "access_token": token}
-
-        is_sent = send_message_whatsapp(user)
+        template_welcome = MailTemplate.objects.filter(slug_name="bienvenida_wpp")
+        # Send welcome message signup kumbio
+        response = send_message_whatsapp(user, template_welcome)
+        status_code = response.get("status_code")
         # owner_wellcome(user)
         # owner_wellcome_whatsapp(user)
         return Response(data, status=status.HTTP_201_CREATED)

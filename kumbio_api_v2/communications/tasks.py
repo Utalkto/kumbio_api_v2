@@ -1,5 +1,7 @@
 """Tasks communications."""
 
+import re
+
 # Celery
 from config import celery_app
 from celery.schedules import crontab
@@ -7,18 +9,15 @@ from celery.schedules import crontab
 # Apis
 from kumbio_api_v2.utils.apis.ultra_message import UltraMessage
 
+# Utils
+from kumbio_api_v2.communications.utils.notifications import get_params_message
+
 
 @celery_app.task(name="send_message_whatsapp")
 def send_message_whatsapp(user, template):
     ultra_msg = UltraMessage()
-    message = 
-    obj_metric = None
-    try:
-        user = User.objects.get(pk=user_pk)
-    except User.DoesNotExist:
-        user = None
-        logger.error(f"User with pk {user_pk} does not exists.")
-    if user:
-        metric = MeideiApi()
-        obj_metric = metric.send_metric(user_pk=user.pk, action=action, data=extra_data)
-    return obj_metric
+    message = template.message
+    message_decode = get_params_message(user, message)
+    phone_number = int(user.phone_number)
+    response = ultra_msg.send_whatsapp_message(phone_number, message_decode)
+    import ipdb; ipdb.set_trace()

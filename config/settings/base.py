@@ -316,6 +316,7 @@ SPECTACULAR_SETTINGS = {
 # ------------------------------------------------------------------------------
 
 # ULTRA MESSAGE
+ULTRAMSG_URL = env("ULTRAMSG_URL", default="")
 ULTRAMSG_INSTANCE = env("ULTRAMSG_INSTANCE", default="")
 ULTRAMSG_TOKEN = env("ULTRAMSG_TOKEN", default="")
 
