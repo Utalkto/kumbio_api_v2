@@ -23,7 +23,6 @@ from kumbio_api_v2.users.models import User
 # from kumbio_api_v2.communications.tasks import send_message_whatsapp
 
 
-
 # Automations
 # from kumbio_api_v2.users.tasks import owner_wellcome, owner_wellcome_whatsapp
 
