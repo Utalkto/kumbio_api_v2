@@ -15,7 +15,6 @@ class MailTemplate(KumbioModel):
     """TYemplates notifications model."""
 
     name: str = models.CharField(max_length=120)
-    slug_name = models.SlugField(unique=True, max_length=120)
     subject: str = models.CharField(max_length=255, blank=True, null=True)
     message: str = models.TextField()
     type: MessageChannel = models.IntegerField(choices=MessageChannel.choices, default=MessageChannel.EMAIL)
