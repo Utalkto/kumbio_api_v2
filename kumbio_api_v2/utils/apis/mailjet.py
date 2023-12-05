@@ -1,8 +1,9 @@
-"""Mailjet API integration."""
-import json
-import logging
-import requests
-from slugify import slugify
+# """Mailjet API integration."""
+# import json
+# import logging
 
-# Django
-from django.conf import settings
+# import requests
+
+# # Django
+# from django.conf import settings
+# from slugify import slugify

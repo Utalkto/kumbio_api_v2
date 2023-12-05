@@ -1,20 +1,18 @@
 """Users serializers."""
 
 # Django
-import jwt
-from django.conf import settings
 from django.contrib.auth import authenticate
 
 # Django REST Framework
 from rest_framework import serializers
-from rest_framework.authtoken.models import Token
+# from rest_framework.authtoken.models import Token
 from rest_framework.validators import UniqueValidator
 
 # Models
-from kumbio_api_v2.users.models import User, Profile
+from kumbio_api_v2.users.models import User
 
 # Utilities
-from kumbio_api_v2.utils.utilities import generate_auth_token, decode_auth_token
+from kumbio_api_v2.utils.utilities import decode_auth_token, generate_auth_token
 
 
 class UserModelSerializer(serializers.ModelSerializer):

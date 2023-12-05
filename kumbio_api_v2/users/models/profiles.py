@@ -1,8 +1,8 @@
 """Profile model."""
 
 # Django
-from django.db import models
 from django.core.validators import RegexValidator
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 # Models
@@ -10,43 +10,28 @@ from kumbio_api_v2.utils.models import KumbioModel
 
 
 class Profile(KumbioModel):
-    """Profile holds a users content data preference.
-    """
+    """Profile holds a users content data preference."""
 
     class DocumentType(models.TextChoices):
-        CEDULA = 'CEDULA', _('Cédula de ciudadanía')
-        TI = 'TI', _('Tarjeta de identidad')
-        DNI = 'DNI', _('Dni')
-        CEDULA_EX = 'CEDULA_EX', _('Cédula de extranjería')
-        PASS = 'PASS', _('Pasaporte')
+        CEDULA = "CEDULA", _("Cédula de ciudadanía")
+        TI = "TI", _("Tarjeta de identidad")
+        DNI = "DNI", _("Dni")
+        CEDULA_EX = "CEDULA_EX", _("Cédula de extranjería")
+        PASS = "PASS", _("Pasaporte")
 
-    user = models.OneToOneField('users.User', on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField("users.User", on_delete=models.CASCADE, related_name="profile")
     organization = models.ForeignKey(
-        'organizations.Organization',
-        on_delete=models.CASCADE,
-        related_name='organization_profile'
+        "organizations.Organization", on_delete=models.CASCADE, related_name="organization_profile"
     )
-    photo = models.FileField(upload_to='users/photos', null=True, blank=True)
+    photo = models.FileField(upload_to="users/photos", null=True, blank=True)
     document_type = models.CharField(
-        max_length=255,
-        choices=DocumentType.choices,
-        default=DocumentType.CEDULA,
-        blank=True, null=True
+        max_length=255, choices=DocumentType.choices, default=DocumentType.CEDULA, blank=True, null=True
     )
 
-    document_number = models.CharField(
-        max_length=50,
-        blank=True, null=True
-    )
+    document_number = models.CharField(max_length=50, blank=True, null=True)
 
-    gender_type = models.CharField(
-        max_length=255,
-        blank=True, null=True
-    )
-    extra_fields = models.JSONField(
-        null=True,
-        blank=True
-    )
+    gender_type = models.CharField(max_length=255, blank=True, null=True)
+    extra_fields = models.JSONField(null=True, blank=True)
     birthdate = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
 
     phone_regex = RegexValidator(

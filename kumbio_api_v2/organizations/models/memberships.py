@@ -40,13 +40,13 @@ class MembershipType(models.Model):
     email = models.BooleanField(
         "Permite notificaciones por email",
         default=False,
-        help_text="Cuando esta en True significa que puede enviar notificaciones vía email."
+        help_text="Cuando esta en True significa que puede enviar notificaciones vía email.",
     )
 
     whatsapp = models.BooleanField(
         "Permite notificaciones por wpp",
         default=False,
-        help_text="Cuando esta en True significa que puede enviar notificaciones vía wpp."
+        help_text="Cuando esta en True significa que puede enviar notificaciones vía wpp.",
     )
 
     class Meta:

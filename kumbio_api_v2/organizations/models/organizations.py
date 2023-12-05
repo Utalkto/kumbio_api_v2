@@ -1,9 +1,6 @@
 """Organizations models"""
 
 # Django
-# Utils
-from datetime import datetime, timedelta
-
 from django.db import models
 
 # Models
@@ -71,21 +68,17 @@ class OrganizationMembership(KumbioModel):
     email_notification = models.BooleanField(
         "Notificaciones por email",
         default=False,
-        help_text="Cuando esta en True significa que puede enviar notificaciones vía email."
+        help_text="Cuando esta en True significa que puede enviar notificaciones vía email.",
     )
     whatsapp_notification = models.BooleanField(
         "Notificaciones por wpp",
         default=False,
-        help_text="Cuando esta en True significa que puede enviar notificaciones vía wpp."
+        help_text="Cuando esta en True significa que puede enviar notificaciones vía wpp.",
     )
     email_notification_available = models.PositiveIntegerField(
-        "Total notificaciones vía email disponibles.",
-        default=0
+        "Total notificaciones vía email disponibles.", default=0
     )
-    wpp_notification_available = models.PositiveIntegerField(
-        "Total notificaciones vía wpp disponibles.",
-        default=0
-    )
+    wpp_notification_available = models.PositiveIntegerField("Total notificaciones vía wpp disponibles.", default=0)
 
     class Meta:
         """Meta class."""

@@ -3,11 +3,10 @@ from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 from django.contrib.auth import get_user_model
 
-User = get_user_model()
-
-
 # Models
 from kumbio_api_v2.users.models import Profile
+
+User = get_user_model()
 
 
 class ProfileInline(admin.StackedInline):

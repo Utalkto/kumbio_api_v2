@@ -1,6 +1,5 @@
 # Django
 from django.db import models
-from slugify import slugify
 
 # Models
 from kumbio_api_v2.utils.models import KumbioModel
@@ -14,6 +13,7 @@ class MessageChannel(models.IntegerChoices):
 
 class MailTemplate(KumbioModel):
     """TYemplates notifications model."""
+
     name: str = models.CharField(max_length=120)
     slug_name = models.SlugField(unique=True, max_length=120)
     subject: str = models.CharField(max_length=255, blank=True, null=True)
@@ -24,8 +24,7 @@ class MailTemplate(KumbioModel):
         # Constraints
         constraints = [
             models.CheckConstraint(
-                check=~models.Q(type=MessageChannel.EMAIL, subject=''),
-                name='email_subject_not_empty'
+                check=~models.Q(type=MessageChannel.EMAIL, subject=""), name="email_subject_not_empty"
             )
         ]
 

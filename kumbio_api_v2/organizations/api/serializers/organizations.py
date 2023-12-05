@@ -22,12 +22,13 @@ class OrganizationModelSerializer(serializers.ModelSerializer):
     """Organization model serializer."""
 
     description = serializers.CharField(required=False)
+    sede_pk = serializers.IntegerField(write_only=True, required=False)
 
     class Meta:
         """Meta class."""
 
         model = Organization
-        fields = ["name", "sub_sector", "description", "country", "currency", "how_you_know_us"]
+        fields = ["id", "name", "sub_sector", "description", "country", "currency", "how_you_know_us"]
 
     def create(self, data):
         # # Create organization

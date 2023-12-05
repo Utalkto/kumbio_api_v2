@@ -1,20 +1,16 @@
 """Clients views."""
 
 # Django REST Framework
-from rest_framework import mixins, status, viewsets
-from rest_framework.decorators import action
+from rest_framework import mixins, viewsets
 
 # Permissions
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
-
-# Models
-from kumbio_api_v2.users.models import User, Profile
+from rest_framework.permissions import IsAuthenticated
 
 # Serializers
-from kumbio_api_v2.users.api.serializers.clients import (
-    ClientModelSerializer
-)
+from kumbio_api_v2.users.api.serializers.clients import ClientModelSerializer
+
+# Models
+from kumbio_api_v2.users.models import User
 
 
 class ClientViewSet(

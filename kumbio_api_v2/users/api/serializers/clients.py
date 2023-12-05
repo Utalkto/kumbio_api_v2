@@ -3,11 +3,11 @@
 # Django REST Framework
 from rest_framework import serializers
 
-# Models
-from kumbio_api_v2.users.models import Profile, User
-
 # Serializers
 from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
+
+# Models
+from kumbio_api_v2.users.models import Profile, User
 
 
 class ProfileModelSerializer(serializers.ModelSerializer):
@@ -31,11 +31,7 @@ class ClientModelSerializer(serializers.ModelSerializer):
         """Meta class."""
 
         model = User
-        fields = [
-            "user_data",
-            "profile_data",
-            "organization_pk"
-        ]
+        fields = ["user_data", "profile_data", "organization_pk"]
 
     def create(self, data):
         """Create and return a new `Profile` instance, given the validated data."""

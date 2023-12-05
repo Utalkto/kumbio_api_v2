@@ -1,8 +1,7 @@
-"""Mailjet API integration."""
+"""Ultra message API integration."""
 import json
-import logging
+
 import requests
-from slugify import slugify
 
 # Django
 from django.conf import settings
@@ -14,7 +13,7 @@ class UltraMessage:
 
     def _get_resource(self, uri, **kwargs):
         """Get resource method."""
-        url = "{}/{}".format(self.url, uri)
+        url = f"{self.url}/{uri}"
         # Headers
         headers = {"Content-Type": "application/json"}
         request_api = requests.get(url, timeout=10, headers=headers)
@@ -24,7 +23,7 @@ class UltraMessage:
 
     def _post_resource(self, uri, **kwargs):
         """Post resource method."""
-        url = "{}/{}".format(self.url, uri)
+        url = f"{self.url}/{uri}"
         # Headers
         headers = {"Content-Type": "application/json"}
         request_api = requests.post(url, data=json.dumps(kwargs), timeout=10, headers=headers)
