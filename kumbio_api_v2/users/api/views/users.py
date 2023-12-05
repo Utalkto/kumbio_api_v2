@@ -11,16 +11,18 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-# from kumbio_api_v2.communications.models import MailTemplate, QueueMessage
-
-# Tasks
-# from kumbio_api_v2.communications.tasks import send_message_whatsapp
-
 # Serializers
 from kumbio_api_v2.users.api.serializers import UserLoginSerializer, UserModelSerializer, UserSignUpSerializer
 
 # Models
 from kumbio_api_v2.users.models import User
+
+# from kumbio_api_v2.communications.models import MailTemplate, QueueMessage
+
+# Tasks
+# from kumbio_api_v2.communications.tasks import send_message_whatsapp
+
+
 
 # Automations
 # from kumbio_api_v2.users.tasks import owner_wellcome, owner_wellcome_whatsapp
