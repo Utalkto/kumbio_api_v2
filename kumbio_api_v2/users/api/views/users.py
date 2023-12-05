@@ -1,5 +1,8 @@
 """Users views."""
 
+# Django
+from django.utils import timezone
+
 # Django REST Framework
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
@@ -13,7 +16,7 @@ from kumbio_api_v2.users.api.serializers import UserLoginSerializer, UserModelSe
 
 # Models
 from kumbio_api_v2.users.models import User
-from kumbio_api_v2.communications.models import MailTemplate
+from kumbio_api_v2.communications.models import MailTemplate, QueueMessage
 
 # Tasks
 from kumbio_api_v2.communications.tasks import send_message_whatsapp
@@ -74,10 +77,29 @@ class UserViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.Lis
         serializer.is_valid(raise_exception=True)
         user, token = serializer.save()
         data = {"user": UserModelSerializer(user).data, "access_token": token}
-        template_welcome = MailTemplate.objects.filter(slug_name="bienvenida_wpp")
+        template_welcome = MailTemplate.objects.get(slug_name="bienvenida_wpp")
         # Send welcome message signup kumbio
-        response = send_message_whatsapp(user, template_welcome)
+        response, message = send_message_whatsapp(user, template_welcome)
         status_code = response.get("status_code")
+        if status_code == 200:
+            response = response.get("response")
+            id_message = response.get("id_message")
+            delivery_date = timezone.localtime()
+            sent = True
+            issue_sent = False
+            id_message = response.get("id")
+        # Create queue message
+        queue, _is_new = QueueMessage.objects.get_or_create(
+            id_message=id_message,
+            user=user,
+            phone_number=user.phone_number,
+            message_type="WELCOME",
+            date_sent=delivery_date,
+            sent=sent,
+            issue_sent=issue_sent,
+            notification_official=message,
+            extra=response
+        )
         # owner_wellcome(user)
         # owner_wellcome_whatsapp(user)
         return Response(data, status=status.HTTP_201_CREATED)

@@ -21,3 +21,4 @@ def send_message_whatsapp(user, template):
     phone_number = int(user.phone_number)
     response = ultra_msg.send_whatsapp_message(phone_number, message_decode)
     import ipdb; ipdb.set_trace()
+    return response, message_decode

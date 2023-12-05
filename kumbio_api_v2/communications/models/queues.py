@@ -15,12 +15,12 @@ class QueueMessage(KumbioModel):
         REMINDER = "REMINDER", "Reminder message"
         OTHER = "OTHER", "Other"
 
+    id_message = models.CharField(max_length=255, blank=True, null=True)
     user = models.ForeignKey(
         "users.user", on_delete=models.CASCADE, related_name="queue_messages", null=True, blank=True
     )
     phone_number = models.CharField(validators=[User.phone_regex], max_length=17, blank=True, null=True)
     attempts = models.PositiveIntegerField(default=0)
-    delivery_date = models.DateTimeField(null=True, blank=True)
     date_sent = models.DateTimeField("Date sent", null=True, blank=True)
     sent = models.BooleanField(
         'was sent?',
@@ -32,6 +32,10 @@ class QueueMessage(KumbioModel):
         max_length=55,
         choices=Type.choices,
         default=Type.OTHER,
+    )
+    notification_official = models.TextField(
+        null=True,
+        blank=True
     )
     extra = models.JSONField(blank=True, null=True)
     template = models.ForeignKey(
