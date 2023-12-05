@@ -13,3 +13,12 @@ REDIS_URL=redis://redis:6379/0
 # Flower
 CELERY_FLOWER_USER=RXpquSJhdlSAiQzMbPorOtmVrysYUSpn
 CELERY_FLOWER_PASSWORD=4lBCJLpyidcC6JLSVqH66jpMSmQEoiTySTMDmPkeLseN2bo1qlL6UWRPGRLHjNoF
+
+#Communications
+MAILJET_API_KEY="3864cfc1acb47c051fa512c05ef8c31c"
+MAILJET_SECRET_KEY="1ca6baded6227e70f4a36b893260caef"
+MAILJET_EMAIL="mail@kumbio.com"
+
+ULTRAMSG_URL = "https://api.ultramsg.com/"
+ULTRAMSG_INSTANCE="instance67188"
+ULTRAMSG_TOKEN="j0pdvf8plg680ocr"

@@ -1,5 +1,7 @@
 """Organizations serializers."""
 
+# Utils
+from datetime import datetime, timedelta
 
 # Django REST Framework
 from rest_framework import serializers
@@ -20,12 +22,13 @@ class OrganizationModelSerializer(serializers.ModelSerializer):
     """Organization model serializer."""
 
     description = serializers.CharField(required=False)
+    sede_pk = serializers.IntegerField(write_only=True, required=False)
 
     class Meta:
         """Meta class."""
 
         model = Organization
-        fields = ["name", "sub_sector", "description", "country", "currency", "how_you_know_us"]
+        fields = ["id", "name", "sub_sector", "description", "country", "currency", "how_you_know_us"]
 
     def create(self, data):
         # # Create organization
@@ -33,17 +36,34 @@ class OrganizationModelSerializer(serializers.ModelSerializer):
         tutorial = request.get("tutorial")
         organization = Organization.objects.create(**data)
         # Create membreship
+        membership = MembershipType.objects.get(membership_type="FREE_TRIAL")
+        date_now = datetime.now().date()
+        total_email_notifications = membership.email_notifications_allowed + membership.email_reminders_allowed
+        total_wpp_notifications = membership.wpp_notifications_allowed + membership.wpp_reminders_allowed
         OrganizationMembership.objects.create(
-            membership=MembershipType.objects.get(membership_type="PREMIUM"),
+            membership=membership,
             organization=organization,
             is_active=True,
+            email_notification=membership.email,
+            whatsapp_notification=membership.whatsapp,
+            email_notification_available=total_email_notifications,
+            wpp_notification_available=total_wpp_notifications,
+            days_duration=membership.trial_days,
+            start_date=date_now,
+            expiration=date_now + timedelta(days=membership.trial_days),
         )
         if tutorial:
             # Create sede
-            Sede.objects.create(
+            sede = Sede.objects.create(
                 name=organization.name,
                 organization=organization,
             )
+            if sede:
+                # Create professional
+                request = self.context.get("request")
+                user = request.user
+                Professional.objects.create(user=user, sede=sede)
+            # Create professional
         return organization
 
 

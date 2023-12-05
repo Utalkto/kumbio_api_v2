@@ -19,8 +19,6 @@ class Notification(KumbioModel):
     sent = models.BooleanField(default=False)
     send_date = models.DateTimeField(null=True, blank=True)
     sent_date = models.DateTimeField(null=True, blank=True)
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
     data = models.JSONField(null=True, blank=True)
     appoinment = models.ForeignKey(
         "appointments.Appointment",
