@@ -125,10 +125,13 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
             request = self.context.get("request")
             user = request.user
             sede = Sede.objects.filter(id=sede_pk).first()
-            professional = Professional.objects.create(
+            professional, _ = Professional.objects.update_or_create(
                 user=user,
-                sede=sede,
+                defaults={
+                    "sede": sede,
+                },
             )
+            validated_data["professional_pk"] = professional.pk
         else:
             professional = self.context.get("professional")
         # Delete current schedule

@@ -1,20 +1,19 @@
 """Users serializers."""
 
 # Django
-import jwt
-from django.conf import settings
 from django.contrib.auth import authenticate
 
 # Django REST Framework
 from rest_framework import serializers
-from rest_framework.authtoken.models import Token
+
+# from rest_framework.authtoken.models import Token
 from rest_framework.validators import UniqueValidator
 
 # Models
 from kumbio_api_v2.users.models import User
 
 # Utilities
-from kumbio_api_v2.utils.utilities import generate_auth_token
+from kumbio_api_v2.utils.utilities import decode_auth_token, generate_auth_token
 
 
 class UserModelSerializer(serializers.ModelSerializer):
@@ -93,14 +92,13 @@ class UserSignUpSerializer(serializers.Serializer):
         full_name = data.get("first_name") + " " + data.get("last_name")
         username = full_name.lower().replace(" ", "-")
         user = User.objects.create_user(username=username, is_owner=True, is_professional=True, **data)
-        token = generate_auth_token(user)
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        email = payload.get("user")
-        if isinstance(email, Token):
-            token = email
-            return token.key, token.user
-        token = user.get_autorized_token
-        return user, token
+        jwt_token = generate_auth_token(user, type="signup")
+        payload, error = decode_auth_token(jwt_token)
+        if error:
+            raise serializers.ValidationError(error)
+        else:
+            token = user.get_authorized_token
+            return user, token
 
 
 class UserLoginSerializer(serializers.Serializer):
@@ -123,12 +121,12 @@ class UserLoginSerializer(serializers.Serializer):
     def create(self, data):
         """Generate or retrieve new token."""
         user = self.context.get("user")
-        token = generate_auth_token(user)
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        email = payload.get("user")
-        if isinstance(email, Token):
-            token = email
-            return token.key, token.user
-        user = User.objects.filter(email=email).last()
-        token = user.get_autorized_token
-        return user, token
+        jwt_token = generate_auth_token(user, type="login")
+        payload, error = decode_auth_token(jwt_token)
+        if error:
+            raise serializers.ValidationError(error)
+        else:
+            email = payload.get("user")
+            user = User.objects.filter(email=email).last()
+            token = user.get_authorized_token
+            return user, token
