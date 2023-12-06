@@ -12,7 +12,7 @@ from rest_framework.exceptions import ValidationError
 class Professional(KumbioModel):
     """Professional model."""
 
-    user = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="professional")
+    user = models.OneToOneField("users.User", on_delete=models.CASCADE, related_name="professional")
     description = models.TextField(max_length=255, blank=True, null=True)
     sede = models.ForeignKey("organizations.Sede", on_delete=models.CASCADE, related_name="organization_professionals")
     services = models.ManyToManyField("organizations.Service", related_name="service_professionals")
@@ -49,6 +49,7 @@ class ProfessionalSchedule(KumbioModel):
 
         verbose_name = "Professional Schedule"
         verbose_name_plural = "Professional Schedules"
+        unique_together = (("professional", "day", "hour_init"), ("professional", "day", "hour_end"))
 
     def __str__(self):
         return f"Schedule {self.professional} - {self.day}"
@@ -60,12 +61,15 @@ class ProfessionalSchedule(KumbioModel):
 
     def check_schedules_overlapping(self):
         overlapping_schedules = ProfessionalSchedule.objects.filter(
-            Q(
-                hour_init__gte=self.hour_init,
-                hour_end__lte=self.hour_end
-            ) | Q(
-                hour_init__lte=self.hour_init,
-                hour_end__gte=self.hour_end
+            Q(# Valida si el nuevo horario se superpone con un horario existente desde afuera o es exactamente el mismo: Existente  | |
+                hour_init__gt=self.hour_init,                                                                         # Nuevo     |     |
+                hour_end__lt=self.hour_end
+            ) | Q( # Valida si el inicio del nuevo horario se superpone con un horario existente desde adentro: Existente |   |
+                hour_init__lt=self.hour_init,                                                                 # Nuevo      |    |
+                hour_end__gt=self.hour_init
+            ) | Q( # Valida si el final del nuevo horario se superpone con un horario existente desde adentro: Existente      |   |
+                hour_init__lt=self.hour_end,                                                                 # Nuevo       |     |
+                hour_end__gt=self.hour_end
             ),
             professional=self.professional,
             day=self.day
@@ -88,6 +92,7 @@ class RestProfessionalSchedule(KumbioModel):
 
         verbose_name = "Rest Professional Schedule"
         verbose_name_plural = "Rest Professional Schedules"
+        unique_together = (("professional", "date_init"), ("professional", "date_end"))
 
     def __str__(self):
         return f"Rest Professional Schedule {self.professional}"
@@ -99,12 +104,15 @@ class RestProfessionalSchedule(KumbioModel):
 
     def check_schedules_overlapping(self):
         overlapping_schedules = RestProfessionalSchedule.objects.filter(
-            Q(
-                date_init__gte=self.date_init,
-                date_end__lte=self.date_end
-            ) | Q(
-                date_init__lte=self.date_init,
-                date_end__gte=self.date_end
+            Q(# Valida si el nuevo horario se superpone con un horario existente desde afuera o es exactamente el mismo: Existente  | |
+                date_init__gt=self.date_init,                                                                         # Nuevo     |     |
+                date_end__lt=self.date_end
+            ) | Q( # Valida si el inicio del nuevo horario se superpone con un horario existente desde adentro: Existente |   |
+                date_init__lt=self.date_init,                                                                 # Nuevo      |    |
+                date_end__gt=self.date_init
+            ) | Q( # Valida si el final del nuevo horario se superpone con un horario existente desde adentro: Existente      |   |
+                date_init__lt=self.date_end,                                                                 # Nuevo       |     |
+                date_end__gt=self.date_end
             ),
             professional=self.professional
         ).exists()

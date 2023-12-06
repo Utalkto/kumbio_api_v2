@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import Q
 
 # Custom
-from kumbio_api_v2.utils.models import KumbioModel
+from kumbio_api_v2.utils.models import KumbioModel, weekdays
 
 # Rest Framework
 from rest_framework.exceptions import ValidationError
@@ -58,6 +58,13 @@ class Appointment(KumbioModel):
 
         verbose_name = "Appointment"
         verbose_name_plural = "Appointments"
+        unique_together = (
+            ("professional_user", "date", "hour_init"),
+            ("professional_user", "date", "hour_end"),
+            ("client_user", "date", "hour_init"),
+            ("client_user", "date", "hour_end"),
+
+        )
 
     def save(self, *args, **kwargs):
         self.check_professional_user_availability()
@@ -65,18 +72,26 @@ class Appointment(KumbioModel):
         return appointment
 
     def check_professional_user_availability(self):
+        self.check_sede_schedule()
+        self.check_professional_user_schedule()
         self.check_professional_user_appointments_overlapping()
         self.check_client_user_appointments_overlapping()
-        self.check_professional_user_schedule()
-        self.check_sede_schedule()
         return None
 
     def check_professional_user_appointments_overlapping(self):
         unavailable = Appointment.objects.filter(
+            Q(# Valida si el nuevo horario se superpone con un horario existente desde afuera o es exactamente el mismo: Existente  | |
+                hour_init__gt=self.hour_init,                                                                         # Nuevo     |     |
+                hour_end__lt=self.hour_end
+            ) | Q( # Valida si el inicio del nuevo horario se superpone con un horario existente desde adentro: Existente |   |
+                hour_init__lt=self.hour_init,                                                                 # Nuevo      |    |
+                hour_end__gt=self.hour_init
+            ) | Q( # Valida si el final del nuevo horario se superpone con un horario existente desde adentro: Existente      |   |
+                hour_init__lt=self.hour_end,                                                                 # Nuevo       |     |
+                hour_end__gt=self.hour_end
+            ),
             professional_user=self.professional_user,
             date=self.date,
-            hour_init__gt=self.hour_init,
-            hour_end__lt=self.hour_end,
         ).exists()
         if unavailable:
             raise ValidationError("La cita que intenta agendar se esta sobreponiendo con otra")
@@ -84,31 +99,44 @@ class Appointment(KumbioModel):
 
     def check_client_user_appointments_overlapping(self):
         unavailable = Appointment.objects.filter(
+            Q(# Valida si el nuevo horario se superpone con un horario existente desde afuera o es exactamente el mismo: Existente  | |
+                hour_init__gt=self.hour_init,                                                                         # Nuevo     |     |
+                hour_end__lt=self.hour_end
+            ) | Q( # Valida si el inicio del nuevo horario se superpone con un horario existente desde adentro: Existente |   |
+                hour_init__lt=self.hour_init,                                                                 # Nuevo      |    |
+                hour_end__gt=self.hour_init
+            ) | Q( # Valida si el final del nuevo horario se superpone con un horario existente desde adentro: Existente      |   |
+                hour_init__lt=self.hour_end,                                                                 # Nuevo       |     |
+                hour_end__gt=self.hour_end
+            ),
             client_user=self.client_user,
             date=self.date,
-            hour_init__gt=self.hour_init,
-            hour_end__lt=self.hour_end,
         ).exists()
         if unavailable:
             raise ValidationError("El cliente ya tiene una cita en este horario")
         return unavailable
 
     def check_professional_user_schedule(self):
-        available = self.professional_user.professional_schedules.filter(
-            day=self.date,
+        available = self.professional_user.professional.professional_schedule.all().filter(
+            day=weekdays[self.date.weekday()],
             hour_init__lte=self.hour_init,
             hour_end__gte=self.hour_end,
+            is_working=True
+        ).exists() and not self.professional_user.professional.rest_professional_schedule.all().filter(
+            date_init__lte=self.date,
+            date_end__gte=self.date
         ).exists()
         if not available:
-            raise ValidationError("Debido al horario del usuario el profesional no esta dispobile para esta cita")
+            raise ValidationError("Debido al horario del profesional no esta disponibile para esta cita")
         return available
 
     def check_sede_schedule(self):
-        available = self.sede.sede_schedules.filter(
-            day=self.date,
+        available = self.sede.sede_schedule.all().filter(
+            day=weekdays[self.date.weekday()],
             hour_init__lte=self.hour_init,
             hour_end__gte=self.hour_end,
+            is_working=True
         ).exists()
         if not available:
-            raise ValidationError("Debido al horario de la sede el profesional no esta dispobile para esta cita")
+            raise ValidationError("Debido al horario de la sede el profesional no esta disponibile para esta cita")
         return available
