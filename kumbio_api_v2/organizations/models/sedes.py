@@ -43,7 +43,7 @@ class HeadquarterSchedule(KumbioModel):
     """Headquarters schedule."""
 
     day = models.CharField(max_length=10, choices=DaysChoices.choices, default=DaysChoices.MONDAY)
-    sede = models.ForeignKey(Sede, on_delete=models.CASCADE, related_name="sede_schedule")
+    sede = models.ForeignKey(Sede, on_delete=models.CASCADE, related_name="sede_schedules")
     hour_init = models.TimeField()
     hour_end = models.TimeField()
 
