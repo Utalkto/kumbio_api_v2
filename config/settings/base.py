@@ -314,3 +314,13 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+# ULTRA MESSAGE
+ULTRAMSG_URL = env("ULTRAMSG_URL", default="")
+ULTRAMSG_INSTANCE = env("ULTRAMSG_INSTANCE", default="")
+ULTRAMSG_TOKEN = env("ULTRAMSG_TOKEN", default="")
+
+# MAIL JET
+MAILJET_API_KEY = env("MAILJET_API_KEY", default="")
+MAILJET_SECRET_KEY = env("MAILJET_SECRET_KEY", default="")
+MAILJET_EMAIL = env("MAILJET_EMAIL", default="")

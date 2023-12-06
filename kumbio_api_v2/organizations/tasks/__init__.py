@@ -1,1 +1,1 @@
-from organizations import *  # noqa
+from .organizations import *  # noqa

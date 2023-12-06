@@ -1,9 +1,6 @@
 """Organizations models"""
 
 # Django
-# Utils
-from datetime import datetime, timedelta
-
 from django.db import models
 
 # Models
@@ -68,15 +65,20 @@ class OrganizationMembership(KumbioModel):
     start_date = models.DateField("Inicio de membresía", null=True, blank=True)
     expiration = models.DateField("Expiración de membresía", auto_now=False, auto_now_add=False)
     days_duration = models.IntegerField(default=30)
-
-    def save(self, *args, **kwargs):
-        days_durration = self.membership.trial_days
-        date_now = datetime.now().date()
-        date_expiration = date_now + timedelta(days=days_durration)
-        self.start_date = date_now
-        self.expiration = date_expiration
-        self.days_duration = days_durration
-        super().save(*args, **kwargs)
+    email_notification = models.BooleanField(
+        "Notificaciones por email",
+        default=False,
+        help_text="Cuando esta en True significa que puede enviar notificaciones vía email.",
+    )
+    whatsapp_notification = models.BooleanField(
+        "Notificaciones por wpp",
+        default=False,
+        help_text="Cuando esta en True significa que puede enviar notificaciones vía wpp.",
+    )
+    email_notification_available = models.PositiveIntegerField(
+        "Total notificaciones vía email disponibles.", default=0
+    )
+    wpp_notification_available = models.PositiveIntegerField("Total notificaciones vía wpp disponibles.", default=0)
 
     class Meta:
         """Meta class."""
