@@ -17,11 +17,14 @@ from kumbio_api_v2.organizations.models import (
     SubSector,
 )
 
+from kumbio_api_v2.organizations.api.serializers.sedes import OrganizationSedeModelSerializer
+
 
 class OrganizationModelSerializer(serializers.ModelSerializer):
     """Organization model serializer."""
 
     description = serializers.CharField(required=False)
+    organization_sedes = OrganizationSedeModelSerializer(many=True, read_only=True)
 
     class Meta:
         """Meta class."""
