@@ -17,7 +17,9 @@ from kumbio_api_v2.organizations.models import (
     SubSector,
 )
 
-from kumbio_api_v2.organizations.api.serializers.sedes import OrganizationSedeModelSerializer
+from kumbio_api_v2.organizations.api.serializers.sedes import (
+    OrganizationSedeModelSerializer
+)
 
 
 class OrganizationModelSerializer(serializers.ModelSerializer):
@@ -30,7 +32,7 @@ class OrganizationModelSerializer(serializers.ModelSerializer):
         """Meta class."""
 
         model = Organization
-        fields = ["id", "name", "sub_sector", "description", "country", "currency", "how_you_know_us"]
+        fields = ["id", "name", "sub_sector", "description", "country", "currency", "how_you_know_us", "organization_sedes"]
 
     def create(self, data):
         # # Create organization
