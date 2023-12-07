@@ -128,7 +128,7 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
             professional, _ = Professional.objects.update_or_create(
                 user=user,
                 defaults={
-                    "sede": sede,
+                    "sede_id": sede.pk,
                 },
             )
             validated_data["professional_pk"] = professional.pk
