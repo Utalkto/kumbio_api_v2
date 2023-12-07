@@ -32,7 +32,15 @@ class OrganizationModelSerializer(serializers.ModelSerializer):
         """Meta class."""
 
         model = Organization
-        fields = ["id", "name", "sub_sector", "description", "country", "currency", "how_you_know_us", "organization_sedes"]
+        fields = [
+            "id",
+            "name",
+            "sub_sector",
+            "description",
+            "country","currency",
+            "how_you_know_us",
+            "organization_sedes"
+        ]
 
     def create(self, data):
         # # Create organization

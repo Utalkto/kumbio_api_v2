@@ -128,7 +128,7 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
             professional, _ = Professional.objects.update_or_create(
                 user=user,
                 defaults={
-                    "sede": sede,
+                    "sede_id": sede.pk,
                 },
             )
             validated_data["professional_pk"] = professional.pk
@@ -150,7 +150,7 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
                 hour_end_rest=hour_end_rest,
             )
             if tutorial:
-                schedule["sede"] = sede_pk
+                schedule["sede_id"] = sede_pk
                 serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
                 serializer_headquarter.is_valid(raise_exception=True)
                 serializer_headquarter.save()
