@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 # Django REST Framework
 from rest_framework import serializers
 
+from kumbio_api_v2.organizations.api.serializers.sedes import OrganizationSedeModelSerializer
+
 # Models
 from kumbio_api_v2.organizations.models import (
     MembershipType,
@@ -15,10 +17,6 @@ from kumbio_api_v2.organizations.models import (
     Sector,
     Sede,
     SubSector,
-)
-
-from kumbio_api_v2.organizations.api.serializers.sedes import (
-    OrganizationSedeModelSerializer
 )
 
 
