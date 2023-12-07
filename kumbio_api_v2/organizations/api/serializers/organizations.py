@@ -37,9 +37,10 @@ class OrganizationModelSerializer(serializers.ModelSerializer):
             "name",
             "sub_sector",
             "description",
-            "country","currency",
+            "country",
+            "currency",
             "how_you_know_us",
-            "organization_sedes"
+            "organization_sedes",
         ]
 
     def create(self, data):
