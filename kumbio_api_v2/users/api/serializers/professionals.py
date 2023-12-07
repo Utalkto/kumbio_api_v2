@@ -114,6 +114,7 @@ class ProfessionalSerializer(serializers.Serializer):
 class ProfessionalScheduleSerializer(serializers.Serializer):
     """Proffesional schedule serializer."""
 
+    professional_pk = serializers.IntegerField(required=False, read_only=True)
     professional_schedule = serializers.ListField(child=serializers.DictField(required=True))
     sede_pk = serializers.IntegerField(required=False)
 
