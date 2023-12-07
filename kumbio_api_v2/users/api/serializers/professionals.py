@@ -150,7 +150,7 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
                 hour_end_rest=hour_end_rest,
             )
             if tutorial:
-                schedule["sede_id"] = sede_pk
+                schedule["sede"] = sede_pk
                 serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
                 serializer_headquarter.is_valid(raise_exception=True)
                 serializer_headquarter.save()
