@@ -71,7 +71,7 @@ class UserViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.Lis
         data = {
             "user": UserModelSerializer(user).data,
             "access_token": token,
-            "organization_pk": user.profile.organization.pk
+            "organization_pk": user.profile.organization.pk,
         }
         return Response(data, status=status.HTTP_201_CREATED)
 

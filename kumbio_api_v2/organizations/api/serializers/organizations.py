@@ -7,9 +7,6 @@ from datetime import datetime, timedelta
 from rest_framework import serializers
 
 from kumbio_api_v2.organizations.api.serializers.sedes import OrganizationSedeModelSerializer
-
-# Models
-from kumbio_api_v2.users.models import Profile
 from kumbio_api_v2.organizations.models import (
     MembershipType,
     Organization,
@@ -19,6 +16,9 @@ from kumbio_api_v2.organizations.models import (
     Sede,
     SubSector,
 )
+
+# Models
+from kumbio_api_v2.users.models import Profile
 
 
 class OrganizationModelSerializer(serializers.ModelSerializer):
@@ -49,7 +49,6 @@ class OrganizationModelSerializer(serializers.ModelSerializer):
         user = request.user
         tutorial = params.get("tutorial")
         organization = Organization.objects.create(**data)
-        import ipdb; ipdb.set_trace()
         # Create membreship
         membership = MembershipType.objects.get(membership_type="FREE_TRIAL")
         date_now = datetime.now().date()
