@@ -43,8 +43,9 @@ class UserAdmin(auth_admin.UserAdmin):
         ],
     ]
     list_display = ["email", "first_name", "is_owner", "is_client", "is_professional"]
-    search_fields = ["name"]
-    ordering = ["id"]
+    list_filter = ["is_staff", "is_owner", "is_professional", "is_client", "date_joined"]
+    search_fields = ["name", "email", "phone_number"]
+    ordering = ["-id"]
     add_fieldsets = (
         (
             None,

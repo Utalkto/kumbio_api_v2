@@ -9,6 +9,7 @@ from rest_framework import serializers
 from kumbio_api_v2.organizations.api.serializers.sedes import OrganizationSedeModelSerializer
 
 # Models
+from kumbio_api_v2.users.models import Profile
 from kumbio_api_v2.organizations.models import (
     MembershipType,
     Organization,
@@ -43,9 +44,12 @@ class OrganizationModelSerializer(serializers.ModelSerializer):
 
     def create(self, data):
         # # Create organization
-        request = self.context.get("request").query_params
-        tutorial = request.get("tutorial")
+        request = self.context.get("request")
+        params = request.query_params
+        user = request.user
+        tutorial = params.get("tutorial")
         organization = Organization.objects.create(**data)
+        import ipdb; ipdb.set_trace()
         # Create membreship
         membership = MembershipType.objects.get(membership_type="FREE_TRIAL")
         date_now = datetime.now().date()
@@ -64,6 +68,11 @@ class OrganizationModelSerializer(serializers.ModelSerializer):
             expiration=date_now + timedelta(days=membership.trial_days),
         )
         if tutorial:
+            # Create profile
+            Profile.objects.create(
+                user=user,
+                organization=organization,
+            )
             # Create sede
             sede = Sede.objects.create(
                 name=organization.name,

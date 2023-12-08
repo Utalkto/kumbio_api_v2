@@ -21,7 +21,7 @@ router.register(r"organizations", organization_views.OrganizationViewSet, basena
 router.register(r"countries", organization_views.CountryViewSet, basename="countries")
 router.register(r"organizations/(?P<organization_pk>[^/.]+)/sedes", organization_views.SedeViewset, basename="sedes")
 router.register(
-    r"services/",
+    r"services",
     organization_views.ServicesViewset,
     basename="services",
 )
