@@ -39,6 +39,7 @@ class OrganizationModelSerializer(serializers.ModelSerializer):
             "country",
             "currency",
             "how_you_know_us",
+            "onboarding_state",
             "organization_sedes",
         ]
 
