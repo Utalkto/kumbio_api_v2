@@ -120,9 +120,10 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         tutorial = self.context.get("tutorial")
+        onboarding_state = self.context.get("onboarding_state")
         professional_schedule = validated_data.get("professional_schedule")
         sede_pk = validated_data.get("sede_pk")
-        if tutorial:
+        if tutorial and "request" in self.context:
             request = self.context.get("request")
             user = request.user
             sede = Sede.objects.filter(id=sede_pk).first()
@@ -154,5 +155,7 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
                 schedule["sede"] = sede_pk
                 serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
                 serializer_headquarter.is_valid(raise_exception=True)
-                serializer_headquarter.save()
+                organization_sede = serializer_headquarter.save()
+                organization_sede.organization.onboarding_state = onboarding_state
+                organization_sede.organization.save(update_fields=["onboarding_state"])
         return validated_data

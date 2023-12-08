@@ -22,7 +22,17 @@ class Organization(KumbioModel):
 
     currency = models.CharField("Moneda", max_length=120, default=None, null=True, blank=True)
 
-    how_you_know_us = models.CharField("Como nos conocio", max_length=120, default=None, null=True, blank=True)
+    how_you_know_us = models.CharField("Como nos conocio", max_length=60, default=None, null=True, blank=True)
+
+    onboarding_state = models.CharField(
+        "Estado de onboarding", max_length=120, default="organization_created", null=True, blank=True
+    )
+
+    @property
+    def sectors(self):
+        from organizations.models.sectors import Sector
+
+        return Sector.objects.filter(organization=self)
 
     @property
     def professionals(self):
