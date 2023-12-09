@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from kumbio_api_v2.users.api.serializers import UserLoginSerializer, UserModelSerializer, UserSignUpSerializer
 
 # Models
-from kumbio_api_v2.users.models import User
+from kumbio_api_v2.users.models import User, Profile
 
 # from kumbio_api_v2.communications.models import MailTemplate, QueueMessage
 
@@ -68,7 +68,8 @@ class UserViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.Lis
         serializer = serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user, token = serializer.save()
-        organization_pk = user.profile.organization.pk if user.profile.organization else None
+        has_profile = hasattr(user, 'profile')
+        organization_pk = user.profile.organization.pk if has_profile else None
         data = {
             "user": UserModelSerializer(user).data,
             "access_token": token,
