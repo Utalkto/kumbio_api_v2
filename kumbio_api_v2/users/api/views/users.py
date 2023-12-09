@@ -68,10 +68,11 @@ class UserViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.Lis
         serializer = serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user, token = serializer.save()
+        organization_pk = user.profile.organization.pk if user.profile.organization else None
         data = {
             "user": UserModelSerializer(user).data,
             "access_token": token,
-            "organization_pk": user.profile.organization.pk,
+            "organization_pk": organization_pk,
         }
         return Response(data, status=status.HTTP_201_CREATED)
 
