@@ -1,8 +1,14 @@
 # Create your models here.
 
+# Django
 from django.db import models
+from django.db.models import Q
 
-from kumbio_api_v2.utils.models import KumbioModel
+# Custom
+from kumbio_api_v2.utils.models import KumbioModel, weekdays
+
+# Rest Framework
+from rest_framework.exceptions import ValidationError
 
 
 class Appointment(KumbioModel):
@@ -23,37 +29,114 @@ class Appointment(KumbioModel):
         STRIPE = "STRIPE", "Stripe"
         OTHER = "OTHER", "Otro"
 
-    class CreatedByOptions(models.TextChoices):
-        """Created by options."""
-
-        CLIENT = "CLIENT", "Cliente"
-        ADMIN = "ADMIN", "Administrador"
-
     # only one service and professional per appointment for easier management
     # so we have to create a new appointment for each service
     # dont need organization because we have sede
-    professional = models.ForeignKey(
-        "organizations.Professional", on_delete=models.CASCADE, related_name="professional_appointments"
+    professional_user = models.ForeignKey(
+        "users.User", limit_choices_to={"is_professional": True}, on_delete=models.SET_NULL, related_name="professional_appointments", null=True
     )
-    sede = models.ForeignKey("organizations.Sede", on_delete=models.CASCADE, related_name="sede_appointments")
-    service = models.ForeignKey("organizations.Service", on_delete=models.CASCADE, related_name="service_appointments")
+    sede = models.ForeignKey("organizations.Sede", on_delete=models.SET_NULL, related_name="sede_appointments", null=True)
+    service = models.ForeignKey("organizations.Service", on_delete=models.SET_NULL, related_name="service_appointments", null=True)
     payment_status = models.CharField(
         max_length=10, choices=PaymentStatusOptions.choices, default=PaymentStatusOptions.PENDING
     )
     payment_method = models.CharField(
         max_length=10, choices=PaymentMethodOptions.choices, default=PaymentMethodOptions.CASH
     )
-    start_date = models.DateTimeField(auto_now=False, auto_now_add=False)
-    end_date = models.DateTimeField(auto_now=False, auto_now_add=False)
-    created_by = models.CharField(max_length=10, choices=CreatedByOptions.choices, default=CreatedByOptions.CLIENT)
-    hour_init = models.TimeField(blank=True, null=True)
-    hour_end = models.TimeField(blank=True, null=True)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    hour_init = models.TimeField(auto_now=False, auto_now_add=False)
+    hour_end = models.TimeField(auto_now=False, auto_now_add=False)
+    created_by_user = models.ForeignKey(
+        "users.User", on_delete=models.SET_NULL, related_name="created_appointments", null=True
+    )
+    client_user = models.ForeignKey(
+        "users.User", limit_choices_to={"is_client": True}, on_delete=models.SET_NULL, related_name="client_appointments", null=True
+    )
 
     class Meta:
         """Meta class."""
 
         verbose_name = "Appointment"
         verbose_name_plural = "Appointments"
+        unique_together = (
+            ("professional_user", "date", "hour_init"),
+            ("professional_user", "date", "hour_end"),
+            ("client_user", "date", "hour_init"),
+            ("client_user", "date", "hour_end"),
 
-    def __str__(self):
-        return f"Appointment {self.professional} - {self.sede} - {self.service}"
+        )
+
+    def save(self, *args, **kwargs):
+        self.check_professional_user_availability()
+        appointment = super().save(*args, **kwargs)
+        return appointment
+
+    def check_professional_user_availability(self):
+        self.check_sede_schedule()
+        self.check_professional_user_schedule()
+        self.check_professional_user_appointments_overlapping()
+        self.check_client_user_appointments_overlapping()
+        return None
+
+    def check_professional_user_appointments_overlapping(self):
+        unavailable = Appointment.objects.filter(
+            Q(# Valida si el nuevo horario se superpone con un horario existente desde afuera o es exactamente el mismo: Existente  | |
+                hour_init__gt=self.hour_init,                                                                         # Nuevo     |     |
+                hour_end__lt=self.hour_end
+            ) | Q( # Valida si el inicio del nuevo horario se superpone con un horario existente desde adentro: Existente |   |
+                hour_init__lt=self.hour_init,                                                                 # Nuevo      |    |
+                hour_end__gt=self.hour_init
+            ) | Q( # Valida si el final del nuevo horario se superpone con un horario existente desde adentro: Existente      |   |
+                hour_init__lt=self.hour_end,                                                                 # Nuevo       |     |
+                hour_end__gt=self.hour_end
+            ),
+            professional_user=self.professional_user,
+            date=self.date,
+        ).exists()
+        if unavailable:
+            raise ValidationError("La cita que intenta agendar se esta sobreponiendo con otra")
+        return unavailable
+
+    def check_client_user_appointments_overlapping(self):
+        unavailable = Appointment.objects.filter(
+            Q(# Valida si el nuevo horario se superpone con un horario existente desde afuera o es exactamente el mismo: Existente  | |
+                hour_init__gt=self.hour_init,                                                                         # Nuevo     |     |
+                hour_end__lt=self.hour_end
+            ) | Q( # Valida si el inicio del nuevo horario se superpone con un horario existente desde adentro: Existente |   |
+                hour_init__lt=self.hour_init,                                                                 # Nuevo      |    |
+                hour_end__gt=self.hour_init
+            ) | Q( # Valida si el final del nuevo horario se superpone con un horario existente desde adentro: Existente      |   |
+                hour_init__lt=self.hour_end,                                                                 # Nuevo       |     |
+                hour_end__gt=self.hour_end
+            ),
+            client_user=self.client_user,
+            date=self.date,
+        ).exists()
+        if unavailable:
+            raise ValidationError("El cliente ya tiene una cita en este horario")
+        return unavailable
+
+    def check_professional_user_schedule(self):
+        available = self.professional_user.professional.professional_schedule.all().filter(
+            day=weekdays[self.date.weekday()],
+            hour_init__lte=self.hour_init,
+            hour_end__gte=self.hour_end,
+            is_working=True
+        ).exists() and not self.professional_user.professional.rest_professional_schedule.all().filter(
+            date_init__lte=self.date,
+            date_end__gte=self.date
+        ).exists()
+        if not available:
+            raise ValidationError("Debido al horario del profesional no esta disponibile para esta cita")
+        return available
+
+    def check_sede_schedule(self):
+        available = self.sede.sede_schedule.all().filter(
+            day=weekdays[self.date.weekday()],
+            hour_init__lte=self.hour_init,
+            hour_end__gte=self.hour_end,
+            is_working=True
+        ).exists()
+        if not available:
+            raise ValidationError("Debido al horario de la sede el profesional no esta disponibile para esta cita")
+        return available
