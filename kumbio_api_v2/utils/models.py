@@ -36,3 +36,5 @@ class DaysChoices(models.TextChoices):
     FRIDAY = "FRIDAY", "Viernes"
     SATURDAY = "SATURDAY", "Sábado"
     SUNDAY = "SUNDAY", "Domingo"
+
+weekdays = [DaysChoices.MONDAY, DaysChoices.TUESDAY, DaysChoices.WEDNESDAY, DaysChoices.THURSDAY, DaysChoices.FRIDAY]
