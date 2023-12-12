@@ -8,6 +8,9 @@ from rest_framework import serializers
 from kumbio_api_v2.organizations.models import HeadquarterSchedule, Professional, ProfessionalSchedule, Sede, Service
 from kumbio_api_v2.users.models import User
 
+# Serializers
+from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
+
 
 class HeadquarterScheduleSerializer(serializers.ModelSerializer):
     """Service model serializer."""
@@ -17,18 +20,6 @@ class HeadquarterScheduleSerializer(serializers.ModelSerializer):
 
         model = HeadquarterSchedule
         fields = "__all__"
-
-
-class OrganizationSedeModelSerializer(serializers.ModelSerializer):
-    """Organization model serializer."""
-
-    sede_schedule = HeadquarterScheduleSerializer(many=True, read_only=True)
-
-    class Meta:
-        """Meta class."""
-
-        model = Sede
-        fields = ["id", "name", "description", "sede_type", "address", "maps_url", "phone", "phone_aux", "organization", "sede_schedule"]
 
 
 class ServiceSedeSerializer(serializers.ModelSerializer):
@@ -42,8 +33,33 @@ class ServiceSedeSerializer(serializers.ModelSerializer):
         read_only_fields = ("sedes",)
 
 
+class OrganizationSedeModelSerializer(serializers.ModelSerializer):
+    """Organization model serializer."""
+
+    sede_schedule = HeadquarterScheduleSerializer(many=True, read_only=True)
+    sede_services = ServiceSedeSerializer(many=True, read_only=True)
+
+    class Meta:
+        """Meta class."""
+
+        model = Sede
+        fields = [
+            "id",
+            "name",
+            "description",
+            "sede_type",
+            "address",
+            "maps_url",
+            "phone",
+            "phone_aux",
+            "organization",
+            "sede_schedule",
+            "sede_services",
+        ]
+
+
 class ProfessionalScheduleModelSerializer(serializers.ModelSerializer):
-    """Service model serializer."""
+    """Professional model serializer."""
 
     class Meta:
         """Meta class."""
@@ -101,3 +117,15 @@ class ServiceProfessionalSerializer(serializers.Serializer):
         # Add professional service
         professional.services.add(service)
         return validated_data
+
+
+class SedeProfessionalModelSerializer(serializers.ModelSerializer):
+    """Proffesional schedule serializer."""
+
+    user = UserModelSerializer()
+
+    class Meta:
+        """Meta class."""
+
+        model = Professional
+        fields = ["id", "user"]

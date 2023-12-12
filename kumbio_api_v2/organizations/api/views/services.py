@@ -2,13 +2,11 @@
 from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
 
+# Serializers
+from kumbio_api_v2.organizations.api.serializers.services import ServicesOrganizationModelSerializer
+
 # Models
 from kumbio_api_v2.organizations.models import Service
-
-# Serializers
-from kumbio_api_v2.organizations.api.serializers.services import (
-    ServicesOrganizationModelSerializer,
-)
 
 
 class ServicesViewset(

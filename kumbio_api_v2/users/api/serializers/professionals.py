@@ -6,9 +6,12 @@
 # Django REST Framework
 from rest_framework import serializers
 
+
+
 # Serializers
-from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
 from kumbio_api_v2.organizations.api.serializers.services import ProfessioanlServicesModelSerializer
+# from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
+
 
 # Models
 from kumbio_api_v2.organizations.models import Professional, ProfessionalSchedule, RestProfessionalSchedule, Sede
@@ -147,7 +150,7 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
                 hour_end=hour_end,
                 defaults={
                     "is_working": True if is_working else False,
-                }
+                },
             )
             if tutorial:
                 schedule["sede"] = sede_pk

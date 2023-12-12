@@ -1,8 +1,8 @@
 """Organizations models"""
 
 # Django
-from django.db import models
 from django.core.validators import RegexValidator
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 # Models
@@ -13,7 +13,7 @@ class Organization(KumbioModel):
     """Organization model."""
 
     class Language(models.TextChoices):
-        SPANISH = 'SPANISH', "Español"
+        SPANISH = "SPANISH", "Español"
         ENGLISH = "ENGLISH", "Inglés"
 
     name = models.CharField(max_length=255)
