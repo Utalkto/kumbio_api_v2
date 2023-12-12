@@ -21,11 +21,7 @@ class MailTemplate(KumbioModel):
 
     class Meta:
         # Constraints
-        constraints = [
-            models.CheckConstraint(
-                check=~models.Q(type=MessageChannel.EMAIL, subject=""), name="email_subject_not_empty"
-            )
-        ]
+        constraints = [models.CheckConstraint(check=~models.Q(type=MessageChannel.EMAIL, subject=""), name="email_subject_not_empty")]
 
     def __str__(self):
         return f"{self.pk} - {self.name}"

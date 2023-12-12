@@ -12,9 +12,7 @@ class Organization(KumbioModel):
 
     name = models.CharField(max_length=255)
 
-    sub_sector = models.ForeignKey(
-        "SubSector", on_delete=models.CASCADE, related_name="organization_sectors", null=True, blank=True
-    )
+    sub_sector = models.ForeignKey("SubSector", on_delete=models.CASCADE, related_name="organization_sectors", null=True, blank=True)
 
     description = models.TextField()
 
@@ -24,9 +22,7 @@ class Organization(KumbioModel):
 
     how_you_know_us = models.CharField("Como nos conocio", max_length=60, default=None, null=True, blank=True)
 
-    onboarding_state = models.CharField(
-        "Estado de onboarding", max_length=120, default="organization_created", null=True, blank=True
-    )
+    onboarding_state = models.CharField("Estado de onboarding", max_length=120, default="organization_created", null=True, blank=True)
 
     @property
     def sectors(self):
@@ -69,9 +65,7 @@ class OrganizationMembership(KumbioModel):
 
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="organization_membership")
 
-    is_active = models.BooleanField(
-        "Esta activa", default=False, help_text="Set to true when the user have an active membership."
-    )
+    is_active = models.BooleanField("Esta activa", default=False, help_text="Set to true when the user have an active membership.")
     start_date = models.DateField("Inicio de membresía", null=True, blank=True)
     expiration = models.DateField("Expiración de membresía", auto_now=False, auto_now_add=False)
     days_duration = models.IntegerField(default=30)
@@ -85,9 +79,7 @@ class OrganizationMembership(KumbioModel):
         default=False,
         help_text="Cuando esta en True significa que puede enviar notificaciones vía wpp.",
     )
-    email_notification_available = models.PositiveIntegerField(
-        "Total notificaciones vía email disponibles.", default=0
-    )
+    email_notification_available = models.PositiveIntegerField("Total notificaciones vía email disponibles.", default=0)
     wpp_notification_available = models.PositiveIntegerField("Total notificaciones vía wpp disponibles.", default=0)
 
     class Meta:
