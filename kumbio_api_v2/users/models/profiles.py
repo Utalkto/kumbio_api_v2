@@ -20,13 +20,9 @@ class Profile(KumbioModel):
         PASS = "PASS", _("Pasaporte")
 
     user = models.OneToOneField("users.User", on_delete=models.CASCADE, related_name="profile")
-    organization = models.ForeignKey(
-        "organizations.Organization", on_delete=models.CASCADE, related_name="organization_profile"
-    )
+    organization = models.ForeignKey("organizations.Organization", on_delete=models.CASCADE, related_name="organization_profile")
     photo = models.FileField(upload_to="users/photos", null=True, blank=True)
-    document_type = models.CharField(
-        max_length=255, choices=DocumentType.choices, default=DocumentType.CEDULA, blank=True, null=True
-    )
+    document_type = models.CharField(max_length=255, choices=DocumentType.choices, default=DocumentType.CEDULA, blank=True, null=True)
 
     document_number = models.CharField(max_length=50, blank=True, null=True)
 
