@@ -74,7 +74,9 @@ class Appointment(KumbioModel):
         return appointment
 
     def check_duration(self):
-        if not self.hour_end - self.hour_init == self.service.duration:
+        minutes_end = (self.hour_end.hour / 60) + self.hour_end.minute
+        minutes_init = (self.hour_init.hour / 60) + self.hour_init.minute
+        if minutes_end - minutes_init >= self.service.duration:
             raise ValidationError("La duración de la cita no coincide con la duración del servicio")
         return None
 

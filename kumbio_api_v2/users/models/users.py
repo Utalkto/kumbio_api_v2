@@ -32,9 +32,7 @@ class User(AbstractUser):
     is_client = models.BooleanField("Cliente", default=False, help_text=("Indica si el usuario es cliente"))
     is_owner = models.BooleanField("Owner", default=False, help_text=("Indica si el usuario es propietario"))
     is_administrator = models.BooleanField("Admin", default=False, help_text=("Indica si el usuario es administrador"))
-    is_professional = models.BooleanField(
-        "Profesional", default=False, help_text=("Indica si el usuario es profesional")
-    )
+    is_professional = models.BooleanField("Profesional", default=False, help_text=("Indica si el usuario es profesional"))
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 

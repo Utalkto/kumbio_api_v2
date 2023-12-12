@@ -13,9 +13,7 @@ class MembershipType(models.Model):
         PRO = "PRO", "Pro"
         PREMIUM = "PREMIUM", "Premium"
 
-    membership_type = models.CharField(
-        max_length=10, choices=MembershipTypeOptions.choices, default=MembershipTypeOptions.FREE
-    )
+    membership_type = models.CharField(max_length=10, choices=MembershipTypeOptions.choices, default=MembershipTypeOptions.FREE)
 
     appointments_allowed = models.PositiveIntegerField("Citas permitidas", null=True, blank=True)
 
