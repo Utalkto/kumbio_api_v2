@@ -6,17 +6,17 @@
 # Django REST Framework
 from rest_framework import serializers
 
-
-
 # Serializers
 from kumbio_api_v2.organizations.api.serializers.services import ProfessioanlServicesModelSerializer
-# from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
-
 
 # Models
 from kumbio_api_v2.organizations.models import Professional, ProfessionalSchedule, RestProfessionalSchedule, Sede
 from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
 from kumbio_api_v2.users.models import User
+
+# from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
+
+
 
 
 class RestProfessionalScheduleModelSerializer(serializers.ModelSerializer):
@@ -152,9 +152,9 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
                     "is_working": True if is_working else False,
                 },
             )
-            if tutorial:
-                schedule["sede"] = sede_pk
-                serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
-                serializer_headquarter.is_valid(raise_exception=True)
-                serializer_headquarter.save()
+            # if tutorial:
+            #     schedule["sede"] = sede_pk
+            #     serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
+            #     serializer_headquarter.is_valid(raise_exception=True)
+            #     serializer_headquarter.save()
         return validated_data
