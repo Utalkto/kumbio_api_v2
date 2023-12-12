@@ -7,13 +7,14 @@
 from rest_framework import serializers
 
 # Serializers
-from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
 from kumbio_api_v2.organizations.api.serializers.services import ProfessioanlServicesModelSerializer
 
 # Models
 from kumbio_api_v2.organizations.models import Professional, ProfessionalSchedule, RestProfessionalSchedule, Sede
 from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
 from kumbio_api_v2.users.models import User
+
+# from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
 
 
 class RestProfessionalScheduleModelSerializer(serializers.ModelSerializer):
@@ -42,7 +43,7 @@ class ProfessionalScheduleModelSerializer(serializers.ModelSerializer):
         """Meta class."""
 
         model = ProfessionalSchedule
-        fields = ["day", "hour_init", "hour_end", "hour_init_rest", "hour_end_rest"]
+        fields = ["day", "hour_init", "hour_end", "is_working"]
 
 
 class ProfessionalModelSerializer(serializers.ModelSerializer):
@@ -73,7 +74,7 @@ class ProfessionalModelSerializer(serializers.ModelSerializer):
         """Meta class."""
 
         model = Professional
-        fields = ["user", "sede", "description", "professional_schedule", "professional_services"]
+        fields = ["id", "user", "sede", "description", "professional_schedule", "professional_services"]
 
 
 class ProfessionalSerializer(serializers.Serializer):
@@ -114,7 +115,7 @@ class ProfessionalSerializer(serializers.Serializer):
 class ProfessionalScheduleSerializer(serializers.Serializer):
     """Proffesional schedule serializer."""
 
-    professional_pk = serializers.IntegerField(required=False, read_only=True)
+    professional_pk = serializers.IntegerField(required=False)
     professional_schedule = serializers.ListField(child=serializers.DictField(required=True))
     sede_pk = serializers.IntegerField(required=False)
 
@@ -134,21 +135,20 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
             )
             validated_data["professional_pk"] = professional.pk
         else:
-            professional = self.context.get("professional")
+            professional = self.context.get("professional") or Professional.objects.get(pk=validated_data.get("professional_pk"))
         # Delete current schedule
-        professional.professional_schedule.all().delete()
         for schedule in professional_schedule:
             day = schedule.get("day")
             hour_init = schedule.get("hour_init")
             hour_end = schedule.get("hour_end")
-            hour_init_rest = schedule.get("hour_init_rest")
-            hour_end_rest = schedule.get("hour_end_rest")
-            professional.professional_schedule.create(
+            is_working = schedule.get("is_working")
+            professional.professional_schedule.update_or_create(
                 day=day,
                 hour_init=hour_init,
                 hour_end=hour_end,
-                hour_init_rest=hour_init_rest,
-                hour_end_rest=hour_end_rest,
+                defaults={
+                    "is_working": True if is_working else False,
+                },
             )
             if tutorial:
                 schedule["sede"] = sede_pk

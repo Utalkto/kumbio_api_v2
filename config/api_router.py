@@ -19,7 +19,7 @@ router.register(r"users", user_views.UserViewSet, basename="users")
 router.register(r"sectors", organization_views.SectorViewSet, basename="sectors")
 router.register(r"organizations", organization_views.OrganizationViewSet, basename="organizations")
 router.register(r"countries", organization_views.CountryViewSet, basename="countries")
-router.register(r"organizations/(?P<organization_pk>[^/.]+)/sedes", organization_views.SedeViewset, basename="sedes")
+router.register(r"sedes", organization_views.SedeViewset, basename="sedes")
 router.register(
     r"services",
     organization_views.ServicesViewset,
@@ -31,6 +31,7 @@ router.register(
     basename="organization_professionals",
 )
 router.register(r"professionals", user_views.ProfesionalViewset, basename="professionals")
+router.register(r"professional-schedule", user_views.ProfesionalScheduleViewset, basename="professional-schedule")
 router.register(r"clients", user_views.ClientViewSet, basename="clients")
 router.register(r"appointments", appointment_views.AppointmentProfesionalViewset, basename="appointments")
 

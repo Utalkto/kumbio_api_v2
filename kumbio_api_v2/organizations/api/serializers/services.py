@@ -22,4 +22,4 @@ class ServicesOrganizationModelSerializer(serializers.ModelSerializer):
         """Meta class."""
 
         model = Service
-        fields = ["id", "name", "description", "price", "duration"]
+        fields = "__all__"

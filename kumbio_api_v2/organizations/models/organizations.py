@@ -1,7 +1,9 @@
 """Organizations models"""
 
 # Django
+from django.core.validators import RegexValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 # Models
 from kumbio_api_v2.utils.models import KumbioModel
@@ -10,7 +12,15 @@ from kumbio_api_v2.utils.models import KumbioModel
 class Organization(KumbioModel):
     """Organization model."""
 
+    class Language(models.TextChoices):
+        SPANISH = "SPANISH", "Español"
+        ENGLISH = "ENGLISH", "Inglés"
+
     name = models.CharField(max_length=255)
+
+    email = models.EmailField(_("email address"), unique=True, blank=True, null=True)
+
+    description = models.TextField(max_length=255, blank=True, null=True)
 
     sub_sector = models.ForeignKey("SubSector", on_delete=models.CASCADE, related_name="organization_sectors", null=True, blank=True)
 
@@ -20,9 +30,21 @@ class Organization(KumbioModel):
 
     currency = models.CharField("Moneda", max_length=120, default=None, null=True, blank=True)
 
+    web_site = models.CharField("Link sitio web", max_length=60, default=None, null=True, blank=True)
+    phone_regex = RegexValidator(
+        regex=r"\+?1?\d{9,15}$",
+        message="Phone number must be entered in the format: +999999999. Up to 15 digits allowed.",
+    )
+    phone_number = models.CharField(max_length=17, blank=True, null=True)
     how_you_know_us = models.CharField("Como nos conocio", max_length=60, default=None, null=True, blank=True)
 
     onboarding_state = models.CharField("Estado de onboarding", max_length=120, default="organization_created", null=True, blank=True)
+
+    language = models.CharField(choices=Language.choices, default=Language.SPANISH)
+
+    automatic_reminder = models.BooleanField(default=False)
+
+    minimun_days_reserve = models.PositiveIntegerField(default=0)
 
     @property
     def sectors(self):
