@@ -17,8 +17,6 @@ from kumbio_api_v2.users.models import User
 # from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
 
 
-
-
 class RestProfessionalScheduleModelSerializer(serializers.ModelSerializer):
     """Rest professional model serializer."""
 
@@ -152,9 +150,9 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
                     "is_working": True if is_working else False,
                 },
             )
-            # if tutorial:
-            #     schedule["sede"] = sede_pk
-            #     serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
-            #     serializer_headquarter.is_valid(raise_exception=True)
-            #     serializer_headquarter.save()
+            if tutorial:
+                schedule["sede"] = sede_pk
+                serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
+                serializer_headquarter.is_valid(raise_exception=True)
+                serializer_headquarter.save()
         return validated_data
