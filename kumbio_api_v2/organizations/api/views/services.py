@@ -3,7 +3,12 @@ from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
 
 # Models
-from kumbio_api_v2.organizations.models import Sede
+from kumbio_api_v2.organizations.models import Service
+
+# Serializers
+from kumbio_api_v2.organizations.api.serializers.services import (
+    ServicesOrganizationModelSerializer,
+)
 
 
 class ServicesViewset(
@@ -18,4 +23,5 @@ class ServicesViewset(
 
     permission_classes = [IsAuthenticated]
     lookup_field = "pk"
-    queryset = Sede.objects.all()
+    queryset = Service.objects.all()
+    serializer_class = ServicesOrganizationModelSerializer

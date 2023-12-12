@@ -9,14 +9,26 @@ from kumbio_api_v2.organizations.models import HeadquarterSchedule, Professional
 from kumbio_api_v2.users.models import User
 
 
+class HeadquarterScheduleSerializer(serializers.ModelSerializer):
+    """Service model serializer."""
+
+    class Meta:
+        """Meta class."""
+
+        model = HeadquarterSchedule
+        fields = "__all__"
+
+
 class OrganizationSedeModelSerializer(serializers.ModelSerializer):
     """Organization model serializer."""
+
+    sede_schedule = HeadquarterScheduleSerializer(many=True, read_only=True)
 
     class Meta:
         """Meta class."""
 
         model = Sede
-        fields = "__all__"
+        fields = ["id", "name", "description", "sede_type", "address", "maps_url", "phone", "phone_aux", "organization", "sede_schedule"]
 
 
 class ServiceSedeSerializer(serializers.ModelSerializer):
@@ -28,16 +40,6 @@ class ServiceSedeSerializer(serializers.ModelSerializer):
         model = Service
         fields = "__all__"
         read_only_fields = ("sedes",)
-
-
-class HeadquarterScheduleSerializer(serializers.ModelSerializer):
-    """Service model serializer."""
-
-    class Meta:
-        """Meta class."""
-
-        model = HeadquarterSchedule
-        fields = "__all__"
 
 
 class ProfessionalScheduleModelSerializer(serializers.ModelSerializer):

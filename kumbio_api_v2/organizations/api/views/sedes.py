@@ -22,8 +22,4 @@ class SedeViewset(
     serializer_class = OrganizationSedeModelSerializer
     lookup_field = "pk"
     permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        organization_pk = self.kwargs.get("organization_pk")
-        queryset = Sede.objects.filter(organization__pk=organization_pk)
-        return queryset
+    queryset = Sede.objects.all().prefetch_related("sede_schedule")

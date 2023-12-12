@@ -54,29 +54,6 @@ class ProfessionalSchedule(KumbioModel):
     def __str__(self):
         return f"Schedule {self.professional} - {self.day}"
 
-    def save(self, *args, **kwargs):
-        self.check_schedules_overlapping()
-        schedule = super().save(*args, **kwargs)
-        return schedule
-
-    def check_schedules_overlapping(self):
-        overlapping_schedules = ProfessionalSchedule.objects.filter(
-            Q(  # Valida si el nuevo horario se superpone con un horario existente desde afuera o es exactamente el mismo: Existente  | |
-                hour_init__gt=self.hour_init, hour_end__lt=self.hour_end  # Nuevo     |     |
-            )
-            | Q(  # Valida si el inicio del nuevo horario se superpone con un horario existente desde adentro: Existente |   |
-                hour_init__lt=self.hour_init, hour_end__gt=self.hour_init  # Nuevo      |    |
-            )
-            | Q(  # Valida si el final del nuevo horario se superpone con un horario existente desde adentro: Existente      |   |
-                hour_init__lt=self.hour_end, hour_end__gt=self.hour_end  # Nuevo       |     |
-            ),
-            professional=self.professional,
-            day=self.day,
-        ).exists()
-        if overlapping_schedules:
-            raise ValidationError("El horario que estas intentando crear se esta sobreponiendo con otro horario")
-        return overlapping_schedules
-
 
 class RestProfessionalSchedule(KumbioModel):
     """Rest professional schedule."""

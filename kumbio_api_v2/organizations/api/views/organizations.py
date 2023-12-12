@@ -1,4 +1,7 @@
 """Organization views."""
+# Django
+from django.db.models import Prefetch
+
 
 # Django REST Framework
 from rest_framework import mixins, status, viewsets
@@ -18,7 +21,7 @@ from kumbio_api_v2.organizations.api.serializers import (
 from kumbio_api_v2.organizations.api.serializers.services import ServicesOrganizationModelSerializer
 
 # Models
-from kumbio_api_v2.organizations.models import Organization, Professional, Sector
+from kumbio_api_v2.organizations.models import Organization, Professional, Sector, Service, Sede
 
 
 class OrganizationViewSet(
@@ -29,10 +32,7 @@ class OrganizationViewSet(
     mixins.RetrieveModelMixin,
     viewsets.GenericViewSet,
 ):
-    """Organization view set.
-
-    Handle sign up, login and account verification.
-    """
+    """Organization view set."""
 
     queryset = Organization.objects.all().prefetch_related("organization_sedes")
     lookup_field = "pk"
@@ -43,15 +43,16 @@ class OrganizationViewSet(
             return ServicesOrganizationModelSerializer
         if self.action in ["sedes"]:
             return OrganizationSedeModelSerializer
-        # if self.action in ["update", "partial_update"] :
-        #     return OrganizationModelSerializer(partial=True)
         else:
             return OrganizationModelSerializer
 
     @action(detail=True, methods=["GET"], url_path=r"services")
     def services(self, request, *args, **kwargs):
         organization = self.get_object()
-        services = organization.all_organization_services
+        services = Service.objects.filter(sedes__organization=organization).distinct()\
+            .prefetch_related(
+                Prefetch('sedes', queryset=Sede.objects.filter(organization=organization))
+            )
         serializer = self.get_serializer(services, many=True)
         data = serializer.data
         return Response(data, status=status.HTTP_200_OK)
@@ -59,7 +60,9 @@ class OrganizationViewSet(
     @action(detail=True, methods=["GET"], url_path=r"sedes")
     def sedes(self, request, *args, **kwargs):
         organization = self.get_object()
-        sedes = organization.headquarter
+        sedes = Sede.objects.filter(organization=organization).select_related(
+            "organization"
+        ).prefetch_related("sede_schedule")
         serializer = self.get_serializer(sedes, many=True)
         data = serializer.data
         return Response(data, status=status.HTTP_200_OK)

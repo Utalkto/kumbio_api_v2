@@ -36,7 +36,8 @@ class ProfesionalViewset(
     lookup_field = "pk"
     permission_classes = [IsAuthenticated]
     queryset = Professional.objects.all().prefetch_related(
-        "professional_schedule", "rest_professional_schedule", "professional_appointments"
+        "professional_schedule",
+        "rest_professional_schedule",
     )
 
     def dispatch(self, request, *args, **kwargs):
@@ -46,7 +47,7 @@ class ProfesionalViewset(
 
     def get_serializer_class(self):
         """Return serializer based on action."""
-        if self.action in ["schedule", "schedule_update", "schedule_onboarding"]:
+        if self.action in ["schedule_onboarding"]:
             return ProfessionalScheduleSerializer
         if self.action in ["rest_professional"]:
             return RestProfessionalScheduleModelSerializer
@@ -102,18 +103,18 @@ class ProfesionalViewset(
         data = serializer.data
         return Response(data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=["POST"], url_path="schedule")
-    def schedule(self, request, *args, **kwargs):
-        """Add professional schedule."""
-        instance = self.get_object()
-        serializer = self.get_serializer(
-            data=request.data,
-            context={"professional": instance, "tutorial": self.tutorial},
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        data = serializer.data
-        return Response(data, status=status.HTTP_200_OK)
+    # @action(detail=True, methods=["POST"], url_path="schedule")
+    # def schedule(self, request, *args, **kwargs):
+    #     """Add professional schedule."""
+    #     instance = self.get_object()
+    #     serializer = self.get_serializer(
+    #         data=request.data,
+    #         context={"professional": instance, "tutorial": self.tutorial},
+    #     )
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     data = serializer.data
+    #     return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["PUT", "PATCH"], url_path="schedule-update")
     def schedule_update(self, request, *args, **kwargs):
@@ -155,25 +156,15 @@ class ProfesionalViewset(
         data = serializer.data
         return Response(data, status=status.HTTP_200_OK)
 
-    # @action(detail=True, methods=["GET"], url_path="available-schedule")
-    # def available_schedule(self, request, *args, **kwargs):
-    #     """Add professional service."""
-    #     instance = self.get_object()
-    #     date = request.GET.get("date")
-    #     date = datetime.strptime(date, "%Y-%m-%d")
-    #     day_of_week = date.strftime('%A').upper()
-    #     professional_schedule = instance.professional_schedule.filter(day=day_of_week).values_list("hour_init")
-    #     professional_appointments = instance.professional_appointments.filter(
-    #       start_date__date=date).values_list("start_date__time")
-    #     professional_rest = instance.rest_professional_schedule.filter(
-    #         day=day_of_week,
-    #         hour_init__isnull=False,
-    #         hour_end__isnull=False,
-    #     ).values('hour_init', 'hour_end')
-    #     time_available = professional_schedule.exclude(
-    #         Q(hour_init__in=Subquery(professional_appointments.values('start_date__time'))) |
-    #         Q(hour_end__in=Subquery(professional_appointments.values('start_date__time'))) |
-    #         Q(hour_init__in=Subquery(professional_rest.values('hour_init'))) |
-    #         Q(hour_end__in=Subquery(professional_rest.values('hour_end'))
-    #     ))
-    #     return Response("ok", status=status.HTTP_200_OK)
+
+class ProfesionalScheduleViewset(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
+    lookup_field = "pk"
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProfessionalScheduleSerializer
