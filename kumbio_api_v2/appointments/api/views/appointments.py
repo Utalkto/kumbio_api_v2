@@ -1,21 +1,20 @@
 """appointments views."""
 
 # Django REST Framework
-from rest_framework import mixins, viewsets, views, response, status
-from rest_framework.permissions import IsAuthenticated
+# Utils
+from datetime import datetime
 
 # Django
 from django.shortcuts import get_object_or_404
+from rest_framework import mixins, response, status, views, viewsets
+from rest_framework.permissions import IsAuthenticated
 
 # Serializers
 from kumbio_api_v2.appointments.api.serializers.appointments import AppointmentSerializer
 
 # Models
 from kumbio_api_v2.appointments.models import Appointment
-from kumbio_api_v2.organizations.models import Sede, Professional, Service
-
-# Utils
-from datetime import datetime
+from kumbio_api_v2.organizations.models import Professional, Sede, Service
 
 
 class AppointmentProfesionalViewset(
@@ -31,13 +30,13 @@ class AppointmentProfesionalViewset(
     queryset = Appointment.objects.all().select_related("professional", "sede", "service")
     serializer_class = AppointmentSerializer
 
-class ProfessionalAvailability(
-    views.APIView
-):
+
+class ProfessionalAvailability(views.APIView):
     """
     Se utiliza un ApiView ya que la respuesta no es directa de un modelo
     sino que debe ser un rango de horas para agendar la cita en un dia especifico.
     """
+
     lookup_field = "pk"
     permission_classes = [IsAuthenticated]
 

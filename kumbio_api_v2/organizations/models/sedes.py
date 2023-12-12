@@ -4,11 +4,12 @@
 from django.db import models
 from django.db.models import Q
 
+# Rest Framework
+from rest_framework.exceptions import ValidationError
+
 # Models
 from kumbio_api_v2.utils.models import DaysChoices, KumbioModel
 
-# Rest Framework
-from rest_framework.exceptions import ValidationError
 
 class Sede(KumbioModel):
     """Sede model."""
@@ -22,9 +23,7 @@ class Sede(KumbioModel):
 
     name = models.CharField(max_length=255)
 
-    organization = models.ForeignKey(
-        "organizations.Organization", on_delete=models.CASCADE, related_name="organization_sedes"
-    )
+    organization = models.ForeignKey("organizations.Organization", on_delete=models.CASCADE, related_name="organization_sedes")
     description = models.TextField(null=True, blank=True)
     sede_type = models.CharField(max_length=10, choices=SedeTypeOptions.choices, default=SedeTypeOptions.PHYSICAL)
     address = models.CharField(max_length=255)
@@ -70,18 +69,17 @@ class HeadquarterSchedule(KumbioModel):
 
     def check_schedules_overlapping(self):
         overlapping_schedules = HeadquarterSchedule.objects.filter(
-            Q(# Valida si el nuevo horario se superpone con un horario existente desde afuera o es exactamente el mismo: Existente  | |
-                hour_init__gt=self.hour_init,                                                                         # Nuevo     |     |
-                hour_end__lt=self.hour_end
-            ) | Q( # Valida si el inicio del nuevo horario se superpone con un horario existente desde adentro: Existente |   |
-                hour_init__lt=self.hour_init,                                                                 # Nuevo      |    |
-                hour_end__gt=self.hour_init
-            ) | Q( # Valida si el final del nuevo horario se superpone con un horario existente desde adentro: Existente      |   |
-                hour_init__lt=self.hour_end,                                                                 # Nuevo       |     |
-                hour_end__gt=self.hour_end
+            Q(  # Valida si el nuevo horario se superpone con un horario existente desde afuera o es exactamente el mismo: Existente  | |
+                hour_init__gt=self.hour_init, hour_end__lt=self.hour_end  # Nuevo     |     |
+            )
+            | Q(  # Valida si el inicio del nuevo horario se superpone con un horario existente desde adentro: Existente |   |
+                hour_init__lt=self.hour_init, hour_end__gt=self.hour_init  # Nuevo      |    |
+            )
+            | Q(  # Valida si el final del nuevo horario se superpone con un horario existente desde adentro: Existente      |   |
+                hour_init__lt=self.hour_end, hour_end__gt=self.hour_end  # Nuevo       |     |
             ),
             sede=self.sede,
-            day=self.day
+            day=self.day,
         ).exists()
         if overlapping_schedules:
             raise ValidationError("El horario que estas intentando crear se esta sobreponiendo con otro horario")
