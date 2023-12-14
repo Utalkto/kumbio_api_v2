@@ -29,7 +29,7 @@ class AppointmentProfesionalViewset(
 ):
     lookup_field = "pk"
     permission_classes = [AllowAny]
-    queryset = Appointment.objects.all().select_related("professional", "sede", "service")
+    queryset = Appointment.objects.all().select_related("professional_user", "sede", "service")
     serializer_class = AppointmentSerializer
 
 
