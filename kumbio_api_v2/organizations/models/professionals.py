@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models import Q
 
 # Rest Framework
-from rest_framework.exceptions import ValidationError
+from rest_framework.serializers import ValidationError
 
 # Custom
 from kumbio_api_v2.utils.models import DaysChoices, KumbioModel
@@ -80,15 +80,18 @@ class RestProfessionalSchedule(KumbioModel):
 
     def check_schedules_overlapping(self):
         overlapping_schedules = RestProfessionalSchedule.objects.filter(
-            Q(  # Valida si el nuevo horario se superpone con un horario existente desde afuera o es exactamente el mismo: Existente  | |
-                date_init__gt=self.date_init, date_end__lt=self.date_end  # Nuevo     |     |
+            Q(
+                Q(  # Valida si el nuevo horario se superpone con un horario existente desde afuera o es exactamente el mismo
+                    date_init__gt=self.date_init, date_end__lt=self.date_end
+                )
+                | Q(  # Valida si el inicio del nuevo horario se superpone con un horario existente desde adentro
+                    date_init__lt=self.date_init, date_end__gt=self.date_init
+                )
+                | Q(  # Valida si el final del nuevo horario se superpone con un horario existente desde adentro
+                    date_init__lt=self.date_end, date_end__gt=self.date_end
+                )
             )
-            | Q(  # Valida si el inicio del nuevo horario se superpone con un horario existente desde adentro: Existente |   |
-                date_init__lt=self.date_init, date_end__gt=self.date_init  # Nuevo      |    |
-            )
-            | Q(  # Valida si el final del nuevo horario se superpone con un horario existente desde adentro: Existente      |   |
-                date_init__lt=self.date_end, date_end__gt=self.date_end  # Nuevo       |     |
-            ),
+            & ~Q(pk=self.pk),
             professional=self.professional,
         ).exists()
         if overlapping_schedules:

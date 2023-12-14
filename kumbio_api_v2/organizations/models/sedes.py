@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import Q
 
 # Rest Framework
-from rest_framework.exceptions import ValidationError
+from rest_framework.serializers import ValidationError
 
 # Models
 from kumbio_api_v2.utils.models import DaysChoices, KumbioModel
@@ -69,15 +69,18 @@ class HeadquarterSchedule(KumbioModel):
 
     def check_schedules_overlapping(self):
         overlapping_schedules = HeadquarterSchedule.objects.filter(
-            Q(  # Valida si el nuevo horario se superpone con un horario existente desde afuera o es exactamente el mismo: Existente  | |
-                hour_init__gt=self.hour_init, hour_end__lt=self.hour_end  # Nuevo     |     |
+            Q(
+                Q(  # Valida si el nuevo horario se superpone con un horario existente desde afuera o es exactamente el mismo
+                    hour_init__gt=self.hour_init, hour_end__lt=self.hour_end
+                )
+                | Q(  # Valida si el inicio del nuevo horario se superpone con un horario existente desde adentro: Existente
+                    hour_init__lt=self.hour_init, hour_end__gt=self.hour_init
+                )
+                | Q(  # Valida si el final del nuevo horario se superpone con un horario existente desde adentro
+                    hour_init__lt=self.hour_end, hour_end__gt=self.hour_end
+                )
             )
-            | Q(  # Valida si el inicio del nuevo horario se superpone con un horario existente desde adentro: Existente |   |
-                hour_init__lt=self.hour_init, hour_end__gt=self.hour_init  # Nuevo      |    |
-            )
-            | Q(  # Valida si el final del nuevo horario se superpone con un horario existente desde adentro: Existente      |   |
-                hour_init__lt=self.hour_end, hour_end__gt=self.hour_end  # Nuevo       |     |
-            ),
+            & ~Q(pk=self.pk),
             sede=self.sede,
             day=self.day,
         ).exists()

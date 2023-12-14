@@ -35,6 +35,5 @@ router.register(r"professional-schedule", user_views.ProfesionalScheduleViewset,
 router.register(r"clients", user_views.ClientViewSet, basename="clients")
 router.register(r"appointments", appointment_views.AppointmentProfesionalViewset, basename="appointments")
 
-
 app_name = "api"
 urlpatterns = router.urls
