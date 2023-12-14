@@ -34,4 +34,12 @@ class DaysChoices(models.TextChoices):
     SUNDAY = "SUNDAY", "Domingo"
 
 
-weekdays = [DaysChoices.MONDAY, DaysChoices.TUESDAY, DaysChoices.WEDNESDAY, DaysChoices.THURSDAY, DaysChoices.FRIDAY]
+weekdays = [
+    DaysChoices.MONDAY,
+    DaysChoices.TUESDAY,
+    DaysChoices.WEDNESDAY,
+    DaysChoices.THURSDAY,
+    DaysChoices.FRIDAY,
+    DaysChoices.SATURDAY,
+    DaysChoices.SUNDAY,
+]

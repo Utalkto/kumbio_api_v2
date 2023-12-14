@@ -7,7 +7,7 @@ class Service(KumbioModel):
     """Service model."""
 
     name = models.CharField(max_length=255)
-    duration = models.TimeField()
+    duration = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     sedes = models.ManyToManyField("organizations.Sede", related_name="sede_services")
     description = models.TextField(blank=True, null=True)
