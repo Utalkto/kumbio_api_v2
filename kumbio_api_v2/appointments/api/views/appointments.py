@@ -3,7 +3,9 @@
 # Django REST Framework
 # Utils
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
+
+from django.db.models import OuterRef, Subquery
 
 # Django
 from django.shortcuts import get_object_or_404
@@ -12,11 +14,12 @@ from rest_framework.permissions import AllowAny
 from rest_framework.serializers import ValidationError
 
 # Serializers
-from kumbio_api_v2.appointments.api.serializers.appointments import AppointmentSerializer, ProfessionalAvailabilitySerializer
+from kumbio_api_v2.appointments.api.serializers.appointments import AppointmentSerializer
 
 # Models
-from kumbio_api_v2.appointments.models import Appointment
+from kumbio_api_v2.appointments.models import Appointment, DurationSchedule
 from kumbio_api_v2.organizations.models import Professional, Sede, Service
+from kumbio_api_v2.utils.models import weekdays
 
 
 class AppointmentProfesionalViewset(
@@ -57,27 +60,99 @@ class ProfessionalAvailability(views.APIView):
         res = response.Response()
         res.status_code = status.HTTP_404_NOT_FOUND
         if self.professional_pk:
-            res.data = self.get_professional_availability()
-            res.status_code = status.HTTP_200_OK
-        elif self.sede_pk and self.service_pk and self.date:
-            res.data = self.get_prefessionals_availability()
-            res.status_code = status.HTTP_200_OK
+            self.professional_obj = get_object_or_404(Professional.select_related("user"), pk=self.professional_pk)
+            if hasattr(self, "date"):
+                res.data = {"date": self.date.strftime("%Y-%m-%d"), "hours": self.get_duration_schedule()}
+                res.status_code = status.HTTP_200_OK
+            else:
+                self.date = self.now_date
+                res.data = {"date": self.date.strftime("%Y-%m-%d"), "hours": self.get_professional_availability()}
+                res.status_code = status.HTTP_200_OK
         return res
 
-    def get_professional_availability(self):
-        self.professional_obj = get_object_or_404(Professional, pk=self.professional_pk)
-        return ProfessionalAvailabilitySerializer(self.professional_obj, context={"date": self.date}).data
-
-    def get_prefessionals_availability(self):
-        self.professionals = Professional.objects.filter(sede=self.sede_obj, services=self.service_obj).prefetch_related(
-            "professional_schedule", "user__professional_appointments"
-        )
-        return ProfessionalAvailabilitySerializer(self.professionals, many=True, context={"date": self.date}).data
-
     def get_date(self):
-        try:
-            self.date = datetime.strptime(self.query_params["date"], "%Y-%m-%d").date()
-        except Exception as e:
-            logging.error(f"Error al convertir la fecha: {e}")
-            raise ValidationError(f"Error al convertir la fecha: {e}")
+        self.now = datetime.now()
+        self.now_date = self.now.date()
+        self.now_time = self.now.time()
+        if "date" in self.query_params:
+            try:
+                self.date = datetime.strptime(self.query_params["date"], "%Y-%m-%d").date()
+            except Exception as e:
+                logging.error(f"Error al convertir la fecha: {e}")
+                raise ValidationError(f"Error al convertir la fecha: {e}")
+            self.date = self.date if self.date >= self.now_date else self.now_date
         return None
+
+    def get_professional_availability(self):
+        allowed_days = self.get_allowd_days()
+        if not allowed_days:
+            raise ValidationError("El profesional no dispone de ningun calendario para trabajar")
+        self.date -= timedelta(days=1)
+        while True:
+            self.date += timedelta(days=1)
+            self.weekday = weekdays[self.date.weekday()]
+            if self.weekday not in allowed_days:
+                continue
+            durations = self.get_duration_schedule()
+            if durations.exists():
+                return durations
+
+    def get_duration_schedule(self):
+        (
+            validate_inner_hour_init_overlapping,
+            validate_inner_hour_end_overlapping,
+            validate_outer_overlapping,
+        ) = self.get_duration_schedule_validations()
+
+        durations = (
+            DurationSchedule.objects.annotate(
+                validate_inner_hour_init_overlapping=Subquery(validate_inner_hour_init_overlapping),
+                validate_inner_hour_end_overlapping=Subquery(validate_inner_hour_end_overlapping),
+                validate_outer_overlapping=Subquery(validate_outer_overlapping),
+            )
+            .filter(
+                service=self.service_obj,
+                professional_schedule__professional=self.professional_obj,
+                day=self.weekday,
+                validate_inner_hour_init_overlapping=False,
+                validate_inner_hour_end_overlapping=False,
+                validate_outer_overlapping=False,
+            )
+            .values("hour_init", "hour_end")
+        )
+
+        if self.date == self.now_date and durations.exists():
+            durations = durations.filter(hour_init__gte=self.now_time)
+        return durations
+
+    def get_duration_schedule_validations(self):
+        validate_inner_hour_init_overlapping = Appointment.objects.filter(
+            professional_user=self.professional_obj.user,
+            date=self.date,
+            hour_init__gte=OuterRef("hour_init"),
+            hour_init__lt=OuterRef("hour_end"),
+        ).exists()
+
+        validate_inner_hour_end_overlapping = Appointment.objects.filter(
+            professional_user=self.professional_obj.user,
+            date=self.date,
+            hour_end__gt=OuterRef("hour_init"),
+            hour_end__lte=OuterRef("hour_end"),
+        ).exists()
+
+        validate_outer_overlapping = Appointment.objects.filter(
+            professional_user=self.professional_obj.user,
+            date=self.date,
+            hour_init__lte=OuterRef("hour_init"),
+            hour_end__gte=OuterRef("hour_end"),
+        ).exists()
+
+        return validate_inner_hour_init_overlapping, validate_inner_hour_end_overlapping, validate_outer_overlapping
+
+    def get_allowd_days(self):
+        allowed_days = list(
+            DurationSchedule.objects.filter(
+                service=self.service_obj, professional_schedule__professional=self.professional_obj
+            ).values_list("day", flat=True)
+        )
+        return allowed_days
