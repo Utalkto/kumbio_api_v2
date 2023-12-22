@@ -61,7 +61,8 @@ class ProfessionalAvailability(views.APIView):
         res.status_code = status.HTTP_404_NOT_FOUND
         if self.professional_pk:
             self.professional_obj = get_object_or_404(Professional, pk=self.professional_pk)
-            if hasattr(self, "date"):
+            if hasattr(self, "date") and self.date >= self.now_date:
+                self.weekday = weekdays[self.date.weekday()]
                 durations = self.get_duration_schedule()
                 res.data = {"date": self.date.strftime("%Y-%m-%d"), "hours": durations}
                 res.status_code = status.HTTP_200_OK
@@ -97,7 +98,6 @@ class ProfessionalAvailability(views.APIView):
             if self.weekday not in allowed_days:
                 continue
             durations = self.get_duration_schedule()
-            print(durations.exists())
             if durations.exists():
                 return durations
 
@@ -135,7 +135,6 @@ class ProfessionalAvailability(views.APIView):
             .values("hour_init", "hour_end")
         )
         if self.date == self.now_date and durations.exists():
-            print(self.now_time)
             durations = durations.filter(hour_init__gte=self.now_time)
         return durations
 
