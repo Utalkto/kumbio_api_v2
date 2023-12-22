@@ -149,6 +149,7 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
             )
             if tutorial:
                 from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
+
                 schedule["sede"] = sede_pk
                 serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
                 serializer_headquarter.is_valid(raise_exception=True)
