@@ -130,7 +130,7 @@ class ProfessionalSchedule(KumbioModel):
             current_hour_end = current_hour_end.time()
             if service.duration > 0:
                 while True:
-                    if current_hour_end >= hour_end:
+                    if current_hour_end > hour_end:
                         break
                     DurationSchedule.objects.create(
                         professional_schedule=self,

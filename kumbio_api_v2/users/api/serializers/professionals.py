@@ -14,8 +14,6 @@ from kumbio_api_v2.organizations.models import Professional, ProfessionalSchedul
 from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
 from kumbio_api_v2.users.models import User
 
-# from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
-
 
 class RestProfessionalScheduleModelSerializer(serializers.ModelSerializer):
     """Rest professional model serializer."""
@@ -104,7 +102,7 @@ class ProfessionalSerializer(serializers.Serializer):
             user = User.objects.create_user(**user_data)
         if sede_pk and user:
             sede = Sede.objects.get(id=sede_pk)
-            professional = Professional.objects.create(user=user, sede=sede, is_user=True)
+            professional = Professional.objects.create(user=user, sede=sede)
             organization = professional.organization
             how_you_know_us = validated_data.get("how_you_know_us")
             organization.how_you_know_us = how_you_know_us
@@ -142,17 +140,17 @@ class ProfessionalScheduleSerializer(serializers.Serializer):
             hour_init = schedule.get("hour_init")
             hour_end = schedule.get("hour_end")
             is_working = schedule.get("is_working")
-            professional.professional_schedule.update_or_create(
+            ProfessionalSchedule.objects.create(
+                professional=professional,
                 day=day,
                 hour_init=hour_init,
                 hour_end=hour_end,
-                defaults={
-                    "is_working": True if is_working else False,
-                },
+                is_working=is_working,
             )
-            # if tutorial:
-            #     schedule["sede"] = sede_pk
-            #     serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
-            #     serializer_headquarter.is_valid(raise_exception=True)
-            #     serializer_headquarter.save()
+            if tutorial:
+                from kumbio_api_v2.organizations.api.serializers.sedes import HeadquarterScheduleSerializer
+                schedule["sede"] = sede_pk
+                serializer_headquarter = HeadquarterScheduleSerializer(data=schedule)
+                serializer_headquarter.is_valid(raise_exception=True)
+                serializer_headquarter.save()
         return validated_data
