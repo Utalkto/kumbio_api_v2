@@ -5,7 +5,7 @@
 import logging
 from datetime import datetime, timedelta
 
-from django.db.models import OuterRef, Subquery
+from django.db.models import Exists, OuterRef
 
 # Django
 from django.shortcuts import get_object_or_404
@@ -60,13 +60,15 @@ class ProfessionalAvailability(views.APIView):
         res = response.Response()
         res.status_code = status.HTTP_404_NOT_FOUND
         if self.professional_pk:
-            self.professional_obj = get_object_or_404(Professional.select_related("user"), pk=self.professional_pk)
+            self.professional_obj = get_object_or_404(Professional, pk=self.professional_pk)
             if hasattr(self, "date"):
-                res.data = {"date": self.date.strftime("%Y-%m-%d"), "hours": self.get_duration_schedule()}
+                durations = self.get_duration_schedule()
+                res.data = {"date": self.date.strftime("%Y-%m-%d"), "hours": durations}
                 res.status_code = status.HTTP_200_OK
             else:
                 self.date = self.now_date
-                res.data = {"date": self.date.strftime("%Y-%m-%d"), "hours": self.get_professional_availability()}
+                durations = self.get_professional_availability()
+                res.data = {"date": self.date.strftime("%Y-%m-%d"), "hours": durations}
                 res.status_code = status.HTTP_200_OK
         return res
 
@@ -87,67 +89,55 @@ class ProfessionalAvailability(views.APIView):
         allowed_days = self.get_allowd_days()
         if not allowed_days:
             raise ValidationError("El profesional no dispone de ningun calendario para trabajar")
-        self.date -= timedelta(days=1)
+        print(self.date)
+        self.date += timedelta(days=-1)
         while True:
             self.date += timedelta(days=1)
             self.weekday = weekdays[self.date.weekday()]
             if self.weekday not in allowed_days:
                 continue
             durations = self.get_duration_schedule()
+            print(durations.exists())
             if durations.exists():
                 return durations
 
     def get_duration_schedule(self):
-        (
-            validate_inner_hour_init_overlapping,
-            validate_inner_hour_end_overlapping,
-            validate_outer_overlapping,
-        ) = self.get_duration_schedule_validations()
-
         durations = (
-            DurationSchedule.objects.annotate(
-                validate_inner_hour_init_overlapping=Subquery(validate_inner_hour_init_overlapping),
-                validate_inner_hour_end_overlapping=Subquery(validate_inner_hour_end_overlapping),
-                validate_outer_overlapping=Subquery(validate_outer_overlapping),
+            DurationSchedule.objects.filter(
+                service=self.service_obj, professional_schedule__professional=self.professional_obj, day=self.weekday
             )
-            .filter(
-                service=self.service_obj,
-                professional_schedule__professional=self.professional_obj,
-                day=self.weekday,
-                validate_inner_hour_init_overlapping=False,
-                validate_inner_hour_end_overlapping=False,
-                validate_outer_overlapping=False,
+            .exclude(
+                Exists(
+                    Appointment.objects.filter(
+                        professional_user=self.professional_obj.user,
+                        date=self.date,
+                        hour_init__gte=OuterRef("hour_init"),
+                        hour_init__lt=OuterRef("hour_end"),
+                    )
+                ),
+                Exists(
+                    Appointment.objects.filter(
+                        professional_user=self.professional_obj.user,
+                        date=self.date,
+                        hour_end__gt=OuterRef("hour_init"),
+                        hour_end__lte=OuterRef("hour_end"),
+                    )
+                ),
+                Exists(
+                    Appointment.objects.filter(
+                        professional_user=self.professional_obj.user,
+                        date=self.date,
+                        hour_init__lte=OuterRef("hour_init"),
+                        hour_end__gte=OuterRef("hour_end"),
+                    )
+                ),
             )
             .values("hour_init", "hour_end")
         )
-
         if self.date == self.now_date and durations.exists():
+            print(self.now_time)
             durations = durations.filter(hour_init__gte=self.now_time)
         return durations
-
-    def get_duration_schedule_validations(self):
-        validate_inner_hour_init_overlapping = Appointment.objects.filter(
-            professional_user=self.professional_obj.user,
-            date=self.date,
-            hour_init__gte=OuterRef("hour_init"),
-            hour_init__lt=OuterRef("hour_end"),
-        ).exists()
-
-        validate_inner_hour_end_overlapping = Appointment.objects.filter(
-            professional_user=self.professional_obj.user,
-            date=self.date,
-            hour_end__gt=OuterRef("hour_init"),
-            hour_end__lte=OuterRef("hour_end"),
-        ).exists()
-
-        validate_outer_overlapping = Appointment.objects.filter(
-            professional_user=self.professional_obj.user,
-            date=self.date,
-            hour_init__lte=OuterRef("hour_init"),
-            hour_end__gte=OuterRef("hour_end"),
-        ).exists()
-
-        return validate_inner_hour_init_overlapping, validate_inner_hour_end_overlapping, validate_outer_overlapping
 
     def get_allowd_days(self):
         allowed_days = list(

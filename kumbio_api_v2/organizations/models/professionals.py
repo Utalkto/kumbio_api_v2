@@ -1,9 +1,10 @@
 # Django
 # Utils
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from django.db import models
 from django.db.models import Q
+from django.db.models.signals import m2m_changed
 
 # Rest Framework
 from rest_framework.serializers import ValidationError
@@ -39,6 +40,20 @@ class Professional(KumbioModel):
         return self.services.filter(pk=service_pk).exists()
 
 
+def services_changed(sender, instance, action, reverse, model, pk_set, using, **kwargs):
+    if action == "post_remove":
+        print(instance, action, reverse, model, pk_set, using)
+        DurationSchedule.objects.filter(professional_schedule__professional=instance, service_id__in=pk_set).delete()
+    elif action == "post_add":
+        services = model.objects.filter(pk__in=pk_set)
+        for service in services.iterator():
+            service.create_duration_schedules(instance)
+        print(instance, action, reverse, model, pk_set, using)
+
+
+m2m_changed.connect(services_changed, sender=Professional.services.through)
+
+
 class ProfessionalSchedule(KumbioModel):
     """Professional schedule."""
 
@@ -58,8 +73,8 @@ class ProfessionalSchedule(KumbioModel):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.current_hour_init = self.self.hour_init
-        self.current_hour_end = self.self.hour_end
+        self.__current_hour_init = self.hour_init
+        self.__current_hour_end = self.hour_end
 
     def __str__(self):
         return f"Schedule {self.professional} - {self.day}"
@@ -69,7 +84,7 @@ class ProfessionalSchedule(KumbioModel):
 
         durations = DurationSchedule.objects.only("pk").filter(professional_schedule=self)
 
-        if self.hour_init != self.current_hour_init or self.hour_end != self.current_hour_end:
+        if self.hour_init != self.__current_hour_init or self.hour_end != self.__current_hour_end:
             if durations.exists():
                 durations.delete()
             self.create_duration_schedules()
@@ -102,10 +117,12 @@ class ProfessionalSchedule(KumbioModel):
 
     def create_duration_schedules(self):
         self.get_professional_services()
+        today = datetime.today()
         for service in self.professional_services.iterator():
             hour_init = self.hour_init
             hour_end = self.hour_end
-            current_hour_end = hour_init + timedelta(minutes=service.duration)
+            current_hour_end = datetime.combine(today, hour_init) + timedelta(minutes=service.duration)
+            current_hour_end = current_hour_end.time()
             if service.duration > 0:
                 while True:
                     if current_hour_end >= hour_end:
@@ -118,7 +135,8 @@ class ProfessionalSchedule(KumbioModel):
                         day=self.day,
                     )
                     hour_init = current_hour_end
-                    current_hour_end += timedelta(minutes=self.duration)
+                    current_hour_end = datetime.combine(today, hour_init) + timedelta(minutes=service.duration)
+                    current_hour_end = current_hour_end.time()
 
     def get_professional_services(self):
         if not hasattr(self, "professional_services"):
