@@ -25,7 +25,10 @@ class Service(KumbioModel):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.__duration_current = self.duration
+        try:
+            self.__duration_current = self.duration
+        except RecursionError:
+            pass
 
     def __str__(self):
         return f"Service {self.name}"
@@ -33,7 +36,7 @@ class Service(KumbioModel):
     def save(self, *args, **kwargs):
         durations = DurationSchedule.objects.only("pk").filter(service=self)
 
-        if self.__duration_current != self.duration:
+        if hasattr(self, "__duration_current") and self.__duration_current != self.duration:
             if durations.exists():
                 durations.delete()
             self.create_duration_schedules()
