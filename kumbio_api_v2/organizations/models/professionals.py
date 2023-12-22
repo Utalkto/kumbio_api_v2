@@ -42,13 +42,11 @@ class Professional(KumbioModel):
 
 def services_changed(sender, instance, action, reverse, model, pk_set, using, **kwargs):
     if action == "post_remove":
-        print(instance, action, reverse, model, pk_set, using)
         DurationSchedule.objects.filter(professional_schedule__professional=instance, service_id__in=pk_set).delete()
     elif action == "post_add":
         services = model.objects.filter(pk__in=pk_set)
         for service in services.iterator():
             service.create_duration_schedules(instance)
-        print(instance, action, reverse, model, pk_set, using)
 
 
 m2m_changed.connect(services_changed, sender=Professional.services.through)
@@ -73,8 +71,11 @@ class ProfessionalSchedule(KumbioModel):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.__current_hour_init = self.hour_init
-        self.__current_hour_end = self.hour_end
+        try:
+            self.__current_hour_init = self.hour_init
+            self.__current_hour_end = self.hour_end
+        except RecursionError:
+            pass
 
     def __str__(self):
         return f"Schedule {self.professional} - {self.day}"
@@ -84,7 +85,11 @@ class ProfessionalSchedule(KumbioModel):
 
         durations = DurationSchedule.objects.only("pk").filter(professional_schedule=self)
 
-        if self.hour_init != self.__current_hour_init or self.hour_end != self.__current_hour_end:
+        if (
+            hasattr(self, "__current_hour_init")
+            and hasattr(self, "__current_hour_end")
+            and (self.hour_init != self.__current_hour_init or self.hour_end != self.__current_hour_end)
+        ):
             if durations.exists():
                 durations.delete()
             self.create_duration_schedules()
@@ -92,7 +97,7 @@ class ProfessionalSchedule(KumbioModel):
         obj = super().save(*args, **kwargs)
 
         if not durations.exists():
-            self.create_duration_schedules(DurationSchedule)
+            self.create_duration_schedules()
         return obj
 
     def check_schedules_overlapping(self):
