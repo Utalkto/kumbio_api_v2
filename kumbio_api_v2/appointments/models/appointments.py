@@ -8,7 +8,7 @@ from django.db.models import Q
 from rest_framework.serializers import ValidationError
 
 # Custom
-from kumbio_api_v2.utils.models import KumbioModel, weekdays
+from kumbio_api_v2.utils.models import DaysChoices, KumbioModel, weekdays
 
 
 class Appointment(KumbioModel):
@@ -161,3 +161,51 @@ class Appointment(KumbioModel):
         if not available:
             raise ValidationError("Debido al horario de la sede el profesional no esta disponibile para esta cita")
         return available
+
+
+class DurationSchedule(KumbioModel):
+    service = models.ForeignKey("organizations.Service", on_delete=models.CASCADE, related_name="durations")
+    professional_schedule = models.ForeignKey("organizations.ProfessionalSchedule", on_delete=models.CASCADE, related_name="durations")
+    hour_init = models.TimeField()
+    hour_end = models.TimeField()
+    day = models.CharField(max_length=10, choices=DaysChoices.choices, default=DaysChoices.MONDAY)
+
+    def __str__(self):
+        return f"{self.day} schedule: {self.hour_init} - {self.hour_end}"
+
+    class Meta:
+        """Meta class."""
+
+        verbose_name = "Duración de la cita"
+        verbose_name_plural = "Duraciones de las citas"
+        unique_together = (
+            ("professional_schedule", "service", "day", "hour_init"),
+            ("professional_schedule", "service", "day", "hour_end"),
+        )
+
+    def save(self, *args, **kwargs):
+        self.check_schedules_overlapping()
+        schedule = super().save(*args, **kwargs)
+        return schedule
+
+    def check_schedules_overlapping(self):
+        overlapping_schedules = DurationSchedule.objects.filter(
+            Q(
+                Q(  # Valida si el nuevo horario se superpone con un horario existente desde afuera o es exactamente el mismo
+                    hour_init__gt=self.hour_init, hour_end__lt=self.hour_end
+                )
+                | Q(  # Valida si el inicio del nuevo horario se superpone con un horario existente desde adentro
+                    hour_init__lt=self.hour_init, hour_end__gt=self.hour_init
+                )
+                | Q(  # Valida si el final del nuevo horario se superpone con un horario existente desde adentro
+                    hour_init__lt=self.hour_end, hour_end__gt=self.hour_end
+                )
+            )
+            & ~Q(pk=self.pk),
+            professional_schedule=self.professional_schedule,
+            service=self.service,
+            day=self.day,
+        ).exists()
+        if overlapping_schedules:
+            raise ValidationError("El horario que estas intentando crear se esta sobreponiendo con otro horario")
+        return overlapping_schedules
