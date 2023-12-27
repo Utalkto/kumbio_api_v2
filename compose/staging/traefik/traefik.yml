@@ -4,7 +4,7 @@ log:
 entryPoints:
   web:
     # http
-    address: ':80'
+    address: ":80"
     http:
       # https://docs.traefik.io/routing/entrypoints/#entrypoint
       redirections:
@@ -13,16 +13,19 @@ entryPoints:
 
   web-secure:
     # https
-    address: ':443'
+    address: ":443"
 
   flower:
-    address: ':5555'
+    address: ":5555"
+
+  react-app:
+    address: ":3000"
 
 certificatesResolvers:
   letsencrypt:
     # https://docs.traefik.io/master/https/acme/#lets-encrypt
     acme:
-      email: 'yesidf26@gmail.com'
+      email: "yesidf26@gmail.com"
       storage: /etc/traefik/acme/acme.json
       # https://docs.traefik.io/master/https/acme/#httpchallenge
       httpChallenge:
@@ -31,7 +34,7 @@ certificatesResolvers:
 http:
   routers:
     web-secure-router:
-      rule: 'Host(`dev2.api.kumbio.com`)'
+      rule: "Host(`dev2.api.kumbio.com`)"
       entryPoints:
         - web-secure
       middlewares:
@@ -42,10 +45,19 @@ http:
         certResolver: letsencrypt
 
     flower-secure-router:
-      rule: 'Host(`dev2.api.kumbio.com`)'
+      rule: "Host(`dev2.api.kumbio.com`)"
       entryPoints:
         - flower
       service: flower
+      tls:
+        # https://docs.traefik.io/master/routing/routers/#certresolver
+        certResolver: letsencrypt
+
+    react-app-secure-router:
+      rule: "Host(`dev2.api.kumbio.com`)"
+      entryPoints:
+        - react-app
+      service: react-app
       tls:
         # https://docs.traefik.io/master/routing/routers/#certresolver
         certResolver: letsencrypt
@@ -55,7 +67,7 @@ http:
       # https://docs.traefik.io/master/middlewares/headers/#hostsproxyheaders
       # https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
       headers:
-        hostsProxyHeaders: ['X-CSRFToken']
+        hostsProxyHeaders: ["X-CSRFToken"]
 
   services:
     django:
@@ -67,6 +79,11 @@ http:
       loadBalancer:
         servers:
           - url: http://flower:5555
+
+    react-app:
+      loadBalancer:
+        servers:
+          - url: http://react-app:3000
 
 providers:
   # https://docs.traefik.io/master/providers/file/

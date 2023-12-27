@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 volumes:
   production_postgres_data: {}
@@ -41,9 +41,10 @@ services:
     volumes:
       - production_traefik:/etc/traefik/acme
     ports:
-      - '0.0.0.0:80:80'
-      - '0.0.0.0:443:443'
-      - '0.0.0.0:5555:5555'
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
+      - "0.0.0.0:5555:5555"
+      - "0.0.0.0:3000:3000"
 
   redis:
     image: redis:6
@@ -62,6 +63,12 @@ services:
     <<: *django
     image: kumbio_api_v2_production_flower
     command: /start-flower
+
+  react-app:
+    build:
+      context: ./../kumbio-app-front-application-base
+      dockerfile: ./compose/staging/Dockerfile
+    image: kumbio_v2_production_front
 
   # awscli:
   #   build:
