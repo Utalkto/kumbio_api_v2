@@ -63,7 +63,7 @@ class HeadquarterSchedule(KumbioModel):
         unique_together = (("sede", "day", "hour_init"), ("sede", "day", "hour_end"))
 
     def save(self, *args, **kwargs):
-        self.check_schedules_overlapping()
+        # self.check_schedules_overlapping()
         schedule = super().save(*args, **kwargs)
         return schedule
 
