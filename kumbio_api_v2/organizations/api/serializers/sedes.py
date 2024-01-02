@@ -4,6 +4,8 @@
 # Django REST Framework
 from rest_framework import serializers
 
+from kumbio_api_v2.organizations.api.serializers.services import OrganizationProfessionalModelSerializer
+
 # Models
 from kumbio_api_v2.organizations.models import HeadquarterSchedule, Professional, ProfessionalSchedule, Sede, Service
 
@@ -38,6 +40,10 @@ class OrganizationSedeModelSerializer(serializers.ModelSerializer):
 
     sede_schedule = HeadquarterScheduleSerializer(many=True, read_only=True)
     sede_services = ServiceSedeSerializer(many=True, read_only=True)
+    sede_professionals = OrganizationProfessionalModelSerializer(source="organization_professionals", many=True, read_only=True)
+    create_sede_schedule = serializers.ListField(child=serializers.DictField(), write_only=True)
+    create_sede_services = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+    create_sede_professionals = serializers.ListField(child=serializers.IntegerField(), write_only=True)
 
     class Meta:
         """Meta class."""
@@ -53,9 +59,36 @@ class OrganizationSedeModelSerializer(serializers.ModelSerializer):
             "phone",
             "phone_aux",
             "organization",
-            "sede_schedule",
+            "sede_professionals",
             "sede_services",
+            "sede_schedule",
+            "create_sede_schedule",
+            "create_sede_services",
+            "create_sede_professionals",
         ]
+
+    def create(self, validated_data):
+        sede_schedule = validated_data.pop("create_sede_schedule")
+        sede_services = validated_data.pop("create_sede_services")
+        sede_professionals = validated_data.pop("create_sede_professionals")
+        sede = Sede.objects.create(**validated_data)
+        for schedule in sede_schedule:
+            schedule["sede"] = sede.pk
+        sede_schedule = HeadquarterScheduleSerializer(data=sede_schedule, many=True)
+        try:
+            sede_schedule.is_valid(raise_exception=True)
+        except Exception as e:
+            sede.delete()
+            raise e
+        sede_schedule.save()
+        sede_services = Service.objects.filter(pk__in=sede_services)
+        for service in sede_services.iterator():
+            service.sedes.add(sede)
+        sede_professionals = Professional.objects.filter(pk__in=sede_professionals)
+        for professional in sede_professionals.iterator():
+            professional.sede = sede
+            professional.save(update_fields=["sede"])
+        return sede
 
 
 class ProfessionalScheduleModelSerializer(serializers.ModelSerializer):
