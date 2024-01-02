@@ -14,7 +14,6 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
     path("users/", include("kumbio_api_v2.users.urls", namespace="users")),
-    path("appointments/", include("kumbio_api_v2.appointments.urls", namespace="appointments")),
     # Your stuff: custom urls includes go here
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
