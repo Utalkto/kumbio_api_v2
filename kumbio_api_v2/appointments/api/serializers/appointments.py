@@ -6,37 +6,48 @@ from rest_framework import serializers
 
 # Models
 from kumbio_api_v2.appointments.models import Appointment
+from kumbio_api_v2.organizations.models import Professional, Sede, Service
+from kumbio_api_v2.users.models import User
+
+# class AppointmentSerializer(serializers.ModelSerializer):
+#     """Appointment model serializer."""
+
+#     class Meta:
+#         model = Appointment
+#         fields = "__all__"
 
 
-class AppointmentSerializer(serializers.ModelSerializer):
-    """Appointment model serializer."""
+class AppointmentAvailability(serializers.Serializer):
+    sede = serializers.PrimaryKeyRelatedField(queryset=Sede.objects.all())
+    service = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all())
+    professional_user = serializers.PrimaryKeyRelatedField(queryset=Professional.objects.all())
+    client_user = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(is_client=True))
+    date = serializers.DateField()
+    hour_init = serializers.TimeField()
+    hour_end = serializers.TimeField()
+    payment_method = serializers.ChoiceField(
+        choices=Appointment.PaymentMethodOptions.choices, default=Appointment.PaymentMethodOptions.CASH
+    )
 
-    class Meta:
-        model = Appointment
-        fields = "__all__"
+    def validate(self, data):
+        validated_data = super().validate(data)
 
+        sede = validated_data["sede"]
+        service = validated_data["service"]
+        professional_user = validated_data["professional_user"]
 
-# class AppointmentAvailability(serializers.Serializer):
+        if not sede:
+            raise serializers.ValidationError("La sede no existe.")
+        if not service:
+            raise serializers.ValidationError("Este servicio no existe.")
+        if not professional_user:
+            raise serializers.ValidationError("Este professional no existe.")
+        return validated_data
 
-#     service_pk = serializers.IntegerField()
-#     place_pk = serializers.IntegerField()
-#     date = serializers.DateField(required=False)
+    def create(self, validated_data):
+        request = self.context.get("request")
+        created_by_user = request.user
 
-#     def get_service_pk(self, data):
-#         try:
-#             service = Service.objects.get(pk=data)
-#         except Service.DoesNotExist:
-#             raise serializers.ValidationError("Este servicio no existe.")
-#         return service
+        appointment = Appointment.objects.create(created_by_user=created_by_user, **validated_data)
 
-#     def get_place_pk(self, data):
-#         try:
-#             place = Sede.objects.get(pk=data)
-#         except Sede.DoesNotExist:
-#             raise serializers.ValidationError("Esta sede no existe.")
-#         return place
-
-
-# class AvailabilityAppointments(serializers.Serializer):
-
-#     appointment = ProfessionalAvailability(many=True)
+        return appointment

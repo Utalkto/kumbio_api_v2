@@ -146,7 +146,7 @@ class ProfesionalViewset(
         serializer.save()
         data = serializer.data
         return Response(data, status=status.HTTP_200_OK)
-    
+
     @action(detail=False, methods=["GET"], url_path="availability")
     def availability(self, request, *args, **kwargs):
         """Retrieve professional availability."""
@@ -154,13 +154,19 @@ class ProfesionalViewset(
         professional_pk = int(data.get("professional_pk")) if data.get("professional_pk") != "all" else "all"
         service_pk = int(data.get("service_pk")) if data.get("service_pk") else None
         place_pk = int(data.get("place_pk")) if data.get("place_pk") else None
-        professional = Professional.objects.select_related(
-            'sede',
-        ).prefetch_related(
-            'professional_schedule',
-            'rest_professional_schedule',
-            'professional_appointments',
-        ).get(pk=professional_pk) if professional_pk != "all" else "all"
+        professional = (
+            Professional.objects.select_related(
+                "sede",
+            )
+            .prefetch_related(
+                "professional_schedule",
+                "rest_professional_schedule",
+                "professional_appointments",
+            )
+            .get(pk=professional_pk)
+            if professional_pk != "all"
+            else "all"
+        )
         service = Service.objects.get(pk=service_pk) if service_pk else None
         place = Sede.objects.get(pk=place_pk) if place_pk else None
         if not service or not professional or not place:

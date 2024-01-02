@@ -1,15 +1,14 @@
 """Utils functions"""
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
+
 import jwt
 
 # Django
 from django.conf import settings
 from django.utils import timezone
-from django.db.models import Q, Min, Max
 
 # Models
-from kumbio_api_v2.organizations.models import Professional, ProfessionalSchedule
-from kumbio_api_v2.appointments.models import Appointment
+from kumbio_api_v2.organizations.models import Professional
 
 
 def generate_auth_token(user, type, **kwargs):
@@ -114,14 +113,6 @@ def professiona_availability(professional, place, service):
         professionals = Professional.objects.filter(
             services=service, professional_schedule__day=current_day_of_week, professional_schedule__is_working=True
         ).prefetch_related("professional_schedule", "professional_appointments")
-        # range_availability = professionals.aggregate(
-        #     min_hour_init=Min('professional_schedule__hour_init'),
-        #     max_hour_end=Max('professional_schedule__hour_end')
-        # )
-        # start_time = range_availability.get('min_hour_init')
-        # end_time = range_availability.get('max_hour_end')
-        # current_time = datetime.combine(current_date, start_time)
-        # finish_time = datetime.combine(current_date, end_time)
         schedule_availability = {}
         schedule_availability["availability"] = []
         for professional in professionals:
@@ -166,7 +157,11 @@ def professiona_availability(professional, place, service):
                     next_time = current_time + timedelta(minutes=service_duration)
                     if next_time <= finish_time:
                         schedule_availability.get("availability").append(
-                            {"hour_init": current_time.strftime("%H:%M"), "hour_end": next_time.strftime("%H:%M")}
+                            {
+                                "professional_pk": professional.pk,
+                                "hour_init": current_time.strftime("%H:%M"),
+                                "hour_end": next_time.strftime("%H:%M"),
+                            }
                         )
                     current_time = next_time
         schedule_availability = sorted(schedule_availability.get("availability"), key=lambda x: x["hour_init"])
