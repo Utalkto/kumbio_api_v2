@@ -10,6 +10,13 @@ from kumbio_api_v2.utils.models import KumbioModel
 class Appointment(KumbioModel):
     """Appointment model."""
 
+    class AppointmensStatusOptions(models.TextChoices):
+        """Appointment status options."""
+
+        PENDING = "PENDING", "Pendiente"
+        COMPLETED = "COMPLETED", "COMPLETED"
+        CANCELED = "CANCELED", "Cancelado"
+
     class PaymentStatusOptions(models.TextChoices):
         """Payment status options."""
 
@@ -29,14 +36,16 @@ class Appointment(KumbioModel):
     # so we have to create a new appointment for each service
     # dont need organization because we have sede
     professional_user = models.ForeignKey(
-        "users.User",
-        limit_choices_to={"is_professional": True},
+        "organizations.Professional",
         on_delete=models.SET_NULL,
         related_name="professional_appointments",
         null=True,
     )
     sede = models.ForeignKey("organizations.Sede", on_delete=models.SET_NULL, related_name="sede_appointments", null=True)
     service = models.ForeignKey("organizations.Service", on_delete=models.SET_NULL, related_name="service_appointments", null=True)
+    appointment_status = models.CharField(
+        max_length=20, choices=AppointmensStatusOptions.choices, default=AppointmensStatusOptions.PENDING
+    )
     payment_status = models.CharField(max_length=10, choices=PaymentStatusOptions.choices, default=PaymentStatusOptions.PENDING)
     payment_method = models.CharField(max_length=10, choices=PaymentMethodOptions.choices, default=PaymentMethodOptions.CASH)
     date = models.DateField(auto_now=False, auto_now_add=False, null=True)

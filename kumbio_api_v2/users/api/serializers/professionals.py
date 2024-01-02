@@ -8,10 +8,10 @@ from rest_framework import serializers
 
 # Serializers
 from kumbio_api_v2.organizations.api.serializers.services import ProfessioanlServicesModelSerializer
+from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
 
 # Models
-from kumbio_api_v2.organizations.models import Professional, ProfessionalSchedule, RestProfessionalSchedule, Sede
-from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
+from kumbio_api_v2.organizations.models import Professional, ProfessionalSchedule, RestProfessionalSchedule, Sede, Service
 from kumbio_api_v2.users.models import User
 
 

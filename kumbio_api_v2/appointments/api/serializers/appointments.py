@@ -16,19 +16,27 @@ class AppointmentSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-# class AppointmentSerializer(serializers.Serializer):
+# class AppointmentAvailability(serializers.Serializer):
 
-#     professional_id = serializers.IntegerField()
-#     service_id = serializers.IntegerField()
-#     place_id = serializers.IntegerField()
+#     service_pk = serializers.IntegerField()
+#     place_pk = serializers.IntegerField()
 #     date = serializers.DateField(required=False)
 
-#     def validate_professional_id(self, data):
+#     def get_service_pk(self, data):
+#         try:
+#             service = Service.objects.get(pk=data)
+#         except Service.DoesNotExist:
+#             raise serializers.ValidationError("Este servicio no existe.")
+#         return service
 
-
-#     # Validate professional, and services and places
+#     def get_place_pk(self, data):
+#         try:
+#             place = Sede.objects.get(pk=data)
+#         except Sede.DoesNotExist:
+#             raise serializers.ValidationError("Esta sede no existe.")
+#         return place
 
 
 # class AvailabilityAppointments(serializers.Serializer):
 
-#     appointment = AppointmentSerializer(many=True)
+#     appointment = ProfessionalAvailability(many=True)
