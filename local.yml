@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 volumes:
   kumbio_api_v2_local_postgres_data: {}
@@ -20,7 +20,7 @@ services:
       - ./.envs/.local/.django
       - ./.envs/.local/.postgres
     ports:
-      - '8000:8000'
+      - "8000:8000"
     command: /start
 
   postgres:
@@ -48,7 +48,7 @@ services:
       - ./config:/app/config:z
       - ./kumbio_api_v2:/app/kumbio_api_v2:z
     ports:
-      - '9000:9000'
+      - "9000:9000"
     command: /start-docs
 
   redis:
@@ -80,5 +80,16 @@ services:
     image: kumbio_api_v2_local_flower
     container_name: kumbio_api_v2_local_flower
     ports:
-      - '5555:5555'
+      - "5555:5555"
     command: /start-flower
+
+  react-app:
+    build:
+      context: ./../kumbio-app-front-application-base
+      dockerfile: ./compose/local/Dockerfile
+    image: kumbio_v2_local_front
+    container_name: kumbio_v2_local_front
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/usr/src/app/src
