@@ -9,13 +9,6 @@ from kumbio_api_v2.appointments.models import Appointment
 from kumbio_api_v2.organizations.models import Professional, Sede, Service
 from kumbio_api_v2.users.models import User
 
-# class AppointmentSerializer(serializers.ModelSerializer):
-#     """Appointment model serializer."""
-
-#     class Meta:
-#         model = Appointment
-#         fields = "__all__"
-
 
 class AppointmentAvailability(serializers.Serializer):
     sede = serializers.PrimaryKeyRelatedField(queryset=Sede.objects.all())
