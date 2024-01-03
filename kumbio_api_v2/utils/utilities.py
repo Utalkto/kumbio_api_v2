@@ -61,7 +61,7 @@ def professiona_availability(professional, place, service, date):
     if not date:
         current_date = datetime.now().date()
     else:
-        current_date = datetime.strptime(date, '%Y-%m-%d')
+        current_date = datetime.strptime(date, "%Y-%m-%d")
         current_date = current_date.date()
     current_day_of_week = current_date.strftime("%A").upper()
     service_duration = service.duration
