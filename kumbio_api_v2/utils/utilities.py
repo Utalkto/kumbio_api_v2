@@ -1,5 +1,6 @@
 """Utils functions"""
-from datetime import datetime, timedelta
+import calendar
+from datetime import date, datetime, timedelta
 
 import jwt
 
@@ -56,14 +57,14 @@ def generate_available_hours(sorted_busy_hours, work_start_time, work_end_time):
     return intervals
 
 
-def professiona_availability(professional, place, service, date):
+def professiona_availability(professional, place, service, date_availability):
     """Check availability professional."""
-    if not date:
+    if not date_availability:
         current_date = datetime.now().date()
+        current_day_of_week = current_date.strftime("%A").upper()
     else:
-        current_date = datetime.strptime(date, "%Y-%m-%d")
-        current_date = current_date.date()
-    current_day_of_week = current_date.strftime("%A").upper()
+        current_date = date.fromisoformat(date_availability)
+        current_day_of_week = calendar.day_name[current_date.isoweekday()].upper()
     service_duration = service.duration
     if professional != "all":
         busy_hours = []
