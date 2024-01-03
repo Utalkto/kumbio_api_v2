@@ -154,6 +154,7 @@ class ProfesionalViewset(
         professional_pk = int(data.get("professional_pk")) if data.get("professional_pk") != "all" else "all"
         service_pk = int(data.get("service_pk")) if data.get("service_pk") else None
         place_pk = int(data.get("place_pk")) if data.get("place_pk") else None
+        date = data.get("date") if data.get("date") else None
         professional = (
             Professional.objects.select_related(
                 "sede",
@@ -172,7 +173,7 @@ class ProfesionalViewset(
         if not service or not professional or not place:
             raise ValidationError("la pk del profesional o el servicio o la sede no existen")
         else:
-            professional_availability = professiona_availability(professional, place, service)
+            professional_availability = professiona_availability(professional, place, service, date)
         data = professional_availability
         return Response(data, status=status.HTTP_200_OK)
 

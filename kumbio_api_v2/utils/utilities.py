@@ -56,9 +56,13 @@ def generate_available_hours(sorted_busy_hours, work_start_time, work_end_time):
     return intervals
 
 
-def professiona_availability(professional, place, service):
+def professiona_availability(professional, place, service, date):
     """Check availability professional."""
-    current_date = datetime.now().date()
+    if not date:
+        current_date = datetime.now().date()
+    else:
+        current_date = datetime.strptime(date, "%Y-%m-%d")
+        current_date = current_date.date()
     current_day_of_week = current_date.strftime("%A").upper()
     service_duration = service.duration
     if professional != "all":
