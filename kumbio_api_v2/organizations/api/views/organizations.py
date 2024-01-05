@@ -21,6 +21,8 @@ from kumbio_api_v2.organizations.api.serializers.services import ServicesOrganiz
 
 # Models
 from kumbio_api_v2.organizations.models import Organization, Professional, Sector, Sede, Service
+from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
+from kumbio_api_v2.users.models import User
 
 
 class OrganizationViewSet(
@@ -42,6 +44,8 @@ class OrganizationViewSet(
             return ServicesOrganizationModelSerializer
         if self.action in ["sedes"]:
             return OrganizationSedeModelSerializer
+        if self.action in ["clients"]:
+            return UserModelSerializer
         else:
             return OrganizationModelSerializer
 
@@ -62,6 +66,14 @@ class OrganizationViewSet(
         organization = self.get_object()
         sedes = Sede.objects.filter(organization=organization).select_related("organization").prefetch_related("sede_schedule")
         serializer = self.get_serializer(sedes, many=True)
+        data = serializer.data
+        return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["GET"], url_path=r"clients")
+    def clients(self, request, *args, **kwargs):
+        organization = self.get_object()
+        clients = User.objects.filter(profile__organization=organization).select_related("profile__organization")
+        serializer = self.get_serializer(clients, many=True)
         data = serializer.data
         return Response(data, status=status.HTTP_200_OK)
 
