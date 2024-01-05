@@ -15,13 +15,13 @@ from kumbio_api_v2.organizations.api.serializers import (
     OrganizationModelSerializer,
     OrganizationProfessionalModelSerializer,
     OrganizationSedeModelSerializer,
-    SectorModelSerializer
+    SectorModelSerializer,
 )
 from kumbio_api_v2.organizations.api.serializers.services import ServicesOrganizationModelSerializer
-from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
 
 # Models
 from kumbio_api_v2.organizations.models import Organization, Professional, Sector, Sede, Service
+from kumbio_api_v2.users.api.serializers.users import UserModelSerializer
 from kumbio_api_v2.users.models import User
 
 
@@ -68,7 +68,7 @@ class OrganizationViewSet(
         serializer = self.get_serializer(sedes, many=True)
         data = serializer.data
         return Response(data, status=status.HTTP_200_OK)
-    
+
     @action(detail=True, methods=["GET"], url_path=r"clients")
     def clients(self, request, *args, **kwargs):
         organization = self.get_object()
