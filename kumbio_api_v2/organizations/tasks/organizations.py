@@ -1,5 +1,4 @@
 from celery.schedules import crontab
-from users.models import User
 
 from config import celery_app
 
@@ -11,6 +10,7 @@ from kumbio_api_v2.communications.notification import replace_message_tags, send
 
 # Models
 from kumbio_api_v2.organizations.models import OrganizationMembership
+from kumbio_api_v2.users.models import User
 
 
 @celery_app.on_after_finalize.connect
