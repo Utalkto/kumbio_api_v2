@@ -1,5 +1,5 @@
 from celery.schedules import crontab
-from users.models import User
+from kumbio_api_v2.users.models import User
 
 from config import celery_app
 
