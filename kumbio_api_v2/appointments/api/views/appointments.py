@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny
 from kumbio_api_v2.appointments.api.serializers.appointments import AppointmentAvailability
 
 # Models
-from kumbio_api_v2.appointments.models import Appointment
+from kumbio_api_v2.appointments.models.appointments import Appointment
 
 
 class AppointmentProfesionalViewset(
