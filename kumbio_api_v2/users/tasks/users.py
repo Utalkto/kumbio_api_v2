@@ -3,7 +3,7 @@ from datetime import timezone
 from celery.schedules import crontab
 
 from config import celery_app
-from kumbio_api_v2.appointments.models import Appointment
+from kumbio_api_v2.appointments.models.appointments import Appointment
 
 # Templates
 from kumbio_api_v2.communications.models.templates import MailTemplate

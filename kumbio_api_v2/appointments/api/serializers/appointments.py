@@ -5,7 +5,7 @@
 from rest_framework import serializers
 
 # Models
-from kumbio_api_v2.appointments.models import Appointment
+from kumbio_api_v2.appointments.models.appointments import Appointment
 from kumbio_api_v2.organizations.models import Professional, Sede, Service
 from kumbio_api_v2.users.models import User
 
