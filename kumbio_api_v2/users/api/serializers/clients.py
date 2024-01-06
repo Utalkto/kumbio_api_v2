@@ -41,4 +41,5 @@ class ClientModelSerializer(serializers.ModelSerializer):
         if user:
             # Create profile
             Profile.objects.create(user=user, organization_id=organization_pk, is_main=True)
+            data["user_data"]["pk"] = user.pk
         return data
